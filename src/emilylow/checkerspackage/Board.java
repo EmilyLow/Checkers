@@ -7,10 +7,11 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 
-
+//To Do: Figure out active weirdness and movement weirdness
 
 public class Board extends javax.swing.JComponent {
 	
@@ -75,6 +76,11 @@ public class Board extends javax.swing.JComponent {
 				
 			}
 		}
+		
+		if(selected != null) {
+			g2.setColor(Color.orange);
+			g2.fill(drawPotentialToken(selected));
+		}
 	}
 	
 	
@@ -126,9 +132,7 @@ public class Board extends javax.swing.JComponent {
 		return null;
 	}
 	
-	public void attemptMove() {
-		
-	}
+	
 	
 	public boolean validMove() {
 		
@@ -143,18 +147,108 @@ public class Board extends javax.swing.JComponent {
 		return false;
 	}
 	
-	
-	
 	//Check if this should be using an existing copy method
 	public Board deepCopy() {
-		
+			
 		return null;
 	}
+	
+	public void attemptSelect(Point2D p) {
+		Square clicked = findSquareAtPoint(p);
+		
+		if(clicked != null) {
+			selected = clicked;
+		}
+		
+	}
+	
+	//? Remove this one and use square one?
+	public void attemptMove(Point2D destination) {
+		Square destSquare = findSquareAtPoint(destination);
+		
+		if (destSquare != null) {
+			//Inform selected it is empty
+			//Inform destination it has token
+			//Change selected to null
+		}
+	}
+	
+	public void attemptMove(Square destSquare) {
+		
+			//Check that selected is an active square
+			//Do this earlier on? 
+			
+			if(selected.getActive()) {
+				
+				
+				//TO DO: Implement turns
+				
+				int currentPlayer = selected.getPlayer();
+				
+				//Inform selected it is empty
+				selected.clear();
+				
+				//Inform destination it has token
+				destSquare.placeToken(currentPlayer);
+			
+				//Change selected to null
+				selected = null;
+				
+				repaint();
+				
+			}
+			
+	
+	}
+	
+	public Square findSquareAtPoint(Point2D point) {
+		for(int y = 0; y < squares.length; y++) {
+			for (int x = 0; x < squares[0].length; x++) {
+				
+				Square checking = squares[x][y];
+				
+				if(checking.getRect().contains(point)) return checking;
+			}
+		}
+		return null;
+		
+	}
+	
+	
 	private class ClickHandler extends MouseAdapter 
 	{
+		//TO DO: Enable unselect 
+		//TO DO: Override equals? 
 		public void mousePressed(MouseEvent event)
 		{
-			
+			Point2D point = event.getPoint();
+			//Check if a token has already been selected
+			if(selected != null) {
+				//Find clicked token
+				Square clicked = findSquareAtPoint(point);
+				if (clicked != null) {
+					
+					//Check if they are deselecting current token
+					if(clicked.getCoord().equals(selected.getCoord())) {
+						//deselect
+						selected = null;
+						repaint();
+					} else {
+						attemptMove(clicked);
+					}
+					
+				} //Else, invalid destination so do nothing
+				
+			}
+			else {
+				//Attempt to select token at clicked point
+				attemptSelect(point);
+				
+				if(selected != null) {
+					//Token selected, so repaint. 
+					repaint();
+				}
+			}
 		}
 		
 		public int[] convertCoord() {

@@ -25,6 +25,18 @@ public class Square {
 		
 	}
 	
+	public void clear() {
+		player = 0;
+		tokenColor = null;
+	}
+	
+	//Double check this code
+	public void placeToken(int owner) {
+		player = owner;
+		setTokenColor();
+	}
+	
+	
 	public Color getSquareColor() {
 		return squareColor;
 	}
@@ -45,15 +57,15 @@ public class Square {
 	}
 
 	
-	public int getToken() {
+	public int getPlayer() {
 		return player;
 	}
 	
-	//Double check this code
-	public void placeToken(int owner) {
-		player = owner;
-		setTokenColor();
+	public boolean getActive() {
+		return active;
 	}
+	
+	
 	
 	public Rectangle2D getRect() {
 		return rect;
