@@ -34,6 +34,9 @@ public class Board extends javax.swing.JComponent {
 	
 	
 	//TO DO: Figure out code to allow double/triple/ect. jumps
+	//TO DO: Implement queens
+	//TO DO: Implement ability to autoskip if no move or deliberately skip turns
+	//TO DO: Implement win and new game
 	Board(StatusWindow statusWindow) {
 		
 		
@@ -141,15 +144,9 @@ public class Board extends javax.swing.JComponent {
 		return null;
 	}
 	
+	public boolean allowedDirection(int[] start, int[] end, boolean queen) {
 	
-	
-	public boolean validMove(int[] start, int[] end, boolean queen) {
-		
-		//Breaking points into individual vars so they're easier to work with
-		int startX = start[0];
 		int startY = start[1];
-		
-		int endX = end[0];
 		int endY = end[1];
 		
 		boolean direction = false;
@@ -177,8 +174,24 @@ public class Board extends javax.swing.JComponent {
 			}
 		}
 		
+		return direction;
+	}
+	
+	
+	
+	public boolean validMove(int[] start, int[] end, boolean queen) {
+		
+		//Breaking points into individual vars so they're easier to work with
+		int startX = start[0];
+		int startY = start[1];
+		
+		int endX = end[0];
+		int endY = end[1];
+		
+		boolean direction = allowedDirection(start, end, queen);
+		
 		//Check for adjacency
-		//! Not sure this is correct
+		//! Not 100% sure this is correct
 		boolean adjacency;
 		if(Math.abs(startX - endX) <= 1 && Math.abs(startY - endY) <= 1) {
 			adjacency = true;
@@ -187,7 +200,7 @@ public class Board extends javax.swing.JComponent {
 			adjacency = false;
 		}
 		
-		//Check for jump
+		
 		
 		return direction && adjacency;
 	}
@@ -227,30 +240,107 @@ public class Board extends javax.swing.JComponent {
 			//Check that DESTINATION is an active square and empty
 			//Do this earlier on? 
 			
-			if(destSquare.getActive() && destSquare.hasToken() == false && validMove(selected.getCoord(), destSquare.getCoord(), false)) {
+			if(destSquare.getActive() && destSquare.hasToken() == false) {
 				
+				if(validMove(selected.getCoord(), destSquare.getCoord(), false)) {
+					
+					int currentPlayer = selected.getPlayer();
+					
+					//Inform selected it is empty
+					selected.clear();
+					
+					//Inform destination it has token
+					destSquare.placeToken(currentPlayer);
 				
-				//TO DO: Implement turns
+					//Change selected to null
+					selected = null;
+					
+					//Go to next turn
+					nextTurn();
+					
+					repaint();
+					
+				} else {
+					attemptJump(destSquare);
+				}
 				
-				int currentPlayer = selected.getPlayer();
-				
-				//Inform selected it is empty
-				selected.clear();
-				
-				//Inform destination it has token
-				destSquare.placeToken(currentPlayer);
-			
-				//Change selected to null
-				selected = null;
-				
-				//Go to next turn
-				nextTurn();
-				
-				repaint();
-				
+		
 			}
 			
 	
+	}
+	
+	public void attemptJump(Square destSquare) {
+		//Checks for single jump initially, with potential ability to iterate later
+		
+		
+		int[] currentCoord = selected.getCoord();
+		int[] destCoord = destSquare.getCoord();
+		
+		//Check direction
+		if(allowedDirection(selected.getCoord(), destSquare.getCoord(), selected.getQueen()) ) {
+			
+			//Abs value of difference needs to be two
+			//If difference is 2, add or subtract one from x & y to get inbetween coord
+			
+			//Check if it is adjacent with one square inbetween
+			if(Math.abs(currentCoord[0] - destCoord[0]) == 2 && Math.abs(currentCoord[1] - destCoord[1]) == 2 ) {
+				
+				int[] btCoord = new int[2];
+						
+				//Calculate inbetween coord
+				if(currentCoord[0] > destCoord[0]) {
+					btCoord[0] = currentCoord[0] -1;
+				} else {
+					btCoord[0] = currentCoord[0] + 1;
+				}
+				if(currentCoord[1] > destCoord[1]) {
+					btCoord[1] = currentCoord[1] -1;
+				} else {
+					btCoord[1] = currentCoord[1] + 1;
+				}
+				
+				Square btSquare = squares[btCoord[0]][btCoord[1]];
+				
+				if(btSquare.hasToken()) {
+					
+					//Inform destination it has token
+					destSquare.placeToken(turn);
+					
+					//Inform selected it is empty
+					 selected.clear();
+					 selected = null;
+					 
+					//Inform between square that it is empty
+					btSquare.clear();
+					
+					//Update score
+					window.updateClaimed(turn);
+					
+					nextTurn();
+					
+					repaint();
+					
+					
+				} //Else, do nothing
+				
+				
+				
+			} //Else, do nothing. Do I want to return something for a failed move?
+			
+			
+			//? Should I mark a failed move somehow? Return success? 
+			
+			
+		
+			
+			
+			
+		} //Else, do nothing
+		
+		
+		//Later, implement ability to check for another jump and decide if computer should auto double jump when possible.
+		
 	}
 	
 	public Square findSquareAtPoint(Point2D point) {

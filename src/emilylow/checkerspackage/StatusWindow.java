@@ -23,16 +23,21 @@ public class StatusWindow extends JComponent{
 	
 	//If false, computer is player 2. 
 	private boolean pvp;
+	private int claimedOne;
+	private int claimedTwo;
 	
 	StatusWindow(){
-		
+		claimedOne = 0;
+		claimedTwo = 0;
 		
 	}
 	
 	public void paintComponent(Graphics g)
 	   {
 	      g.drawString("Player " + turn + "'s turn", MESSAGE_X, MESSAGE_Y);
-	      
+	      g.drawString("Pieces won:", MESSAGE_X + 200, MESSAGE_Y -40);
+	      g.drawString("Player 1: " + claimedOne, MESSAGE_X + 200, MESSAGE_Y -20);
+	      g.drawString("Player 2: " + claimedTwo, MESSAGE_X + 200, MESSAGE_Y );
 	   }  
 
 	 public Dimension getPreferredSize() 
@@ -56,5 +61,15 @@ public class StatusWindow extends JComponent{
 	
 	public void newGame() {
 		
+	}
+	
+	public void updateClaimed(int player) {
+		if (player ==1) {
+			claimedOne++;
+		}
+		else {
+			claimedTwo++;
+		}
+		repaint();
 	}
 }
