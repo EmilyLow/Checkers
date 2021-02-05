@@ -11,7 +11,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 
-//To Do: Figure out active weirdness and movement weirdness
 
 public class Board extends javax.swing.JComponent {
 	
@@ -156,22 +155,13 @@ public class Board extends javax.swing.JComponent {
 	public void attemptSelect(Point2D p) {
 		Square clicked = findSquareAtPoint(p);
 		
-		if(clicked != null) {
+		if(clicked != null && clicked.hasToken()) {
 			selected = clicked;
 		}
 		
 	}
 	
-	//? Remove this one and use square one?
-	public void attemptMove(Point2D destination) {
-		Square destSquare = findSquareAtPoint(destination);
-		
-		if (destSquare != null) {
-			//Inform selected it is empty
-			//Inform destination it has token
-			//Change selected to null
-		}
-	}
+
 	
 	public void attemptMove(Square destSquare) {
 		
@@ -217,7 +207,7 @@ public class Board extends javax.swing.JComponent {
 	
 	private class ClickHandler extends MouseAdapter 
 	{
-		//TO DO: Enable unselect 
+		
 		//TO DO: Override equals? 
 		public void mousePressed(MouseEvent event)
 		{
