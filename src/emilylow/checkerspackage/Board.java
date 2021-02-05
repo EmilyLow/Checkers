@@ -10,6 +10,9 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+//Make more specific?
+import java.lang.*; 
+
 
 
 public class Board extends javax.swing.JComponent {
@@ -29,6 +32,8 @@ public class Board extends javax.swing.JComponent {
 	//Either 1 or 2
 	private int turn;
 	
+	
+	//TO DO: Figure out code to allow double/triple/ect. jumps
 	Board(StatusWindow statusWindow) {
 		
 		
@@ -138,9 +143,53 @@ public class Board extends javax.swing.JComponent {
 	
 	
 	
-	public boolean validMove() {
+	public boolean validMove(int[] start, int[] end, boolean queen) {
 		
-		return false;
+		//Breaking points into individual vars so they're easier to work with
+		int startX = start[0];
+		int startY = start[1];
+		
+		int endX = end[0];
+		int endY = end[1];
+		
+		boolean direction = false;
+		//Check for moving in correct direction
+		if(queen) {
+			direction = true;
+		} else if(turn == 1) {
+			
+			//Check that player 1 moves up the board
+			if(endY < startY) {
+				direction = true;
+			}
+			else {
+				//Unnecessary, since already false, but for clarity
+				direction = false;
+			}
+		} else  {//turn == 2 
+			 
+			//Check that player 2 moves down the board
+			if (endY > startY) {
+				direction = true;
+			}
+			else {
+				direction = false;
+			}
+		}
+		
+		//Check for adjacency
+		//! Not sure this is correct
+		boolean adjacency;
+		if(Math.abs(startX - endX) <= 1 && Math.abs(startY - endY) <= 1) {
+			adjacency = true;
+		}
+		else {
+			adjacency = false;
+		}
+		
+		//Check for jump
+		
+		return direction && adjacency;
 	}
 	
 	public void nextTurn() {
@@ -178,7 +227,7 @@ public class Board extends javax.swing.JComponent {
 			//Check that DESTINATION is an active square and empty
 			//Do this earlier on? 
 			
-			if(destSquare.getActive() && destSquare.hasToken() == false) {
+			if(destSquare.getActive() && destSquare.hasToken() == false && validMove(selected.getCoord(), destSquare.getCoord(), false)) {
 				
 				
 				//TO DO: Implement turns
