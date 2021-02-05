@@ -175,10 +175,10 @@ public class Board extends javax.swing.JComponent {
 	
 	public void attemptMove(Square destSquare) {
 		
-			//Check that selected is an active square
+			//Check that DESTINATION is an active square and empty
 			//Do this earlier on? 
 			
-			if(selected.getActive()) {
+			if(destSquare.getActive() && destSquare.hasToken() == false) {
 				
 				
 				//TO DO: Implement turns

@@ -20,9 +20,10 @@ public class Square {
 		
 		setActive();
 		setStartToken();
-		System.out.println("New square");
-		System.out.println(coord[0] + " " + coord[1]);
-		
+//		System.out.println("New square");
+//		System.out.println(coord[0] + " " + coord[1]);
+//		System.out.println("active " + active);
+//		
 	}
 	
 	public void clear() {
