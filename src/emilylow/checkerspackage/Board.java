@@ -33,15 +33,20 @@ public class Board extends javax.swing.JComponent {
 		
 		
 		
-		//!! This feels like potentially bad practice?
-		window = statusWindow;
-		window.setBoard(this);
+		
 		//This is temporary, before Computer is implemented
 		pvp = false;
 		
 		selected = null; 
 		turn = 1;
 		squares = new Square[8][8];
+		
+		//!! This feels like potentially bad practice?
+		window = statusWindow;
+		window.setBoard(this);
+		
+		
+		
 		setUpBoard();
 		addMouseListener(new ClickHandler());
 		repaint();
@@ -139,7 +144,12 @@ public class Board extends javax.swing.JComponent {
 	}
 	
 	public void nextTurn() {
-		
+		if(turn == 1) {
+			turn = 2;
+		} else {
+			turn = 1;
+		}
+		window.setTurn(turn);
 	}
 	
 	public boolean checkWin() {
@@ -155,7 +165,7 @@ public class Board extends javax.swing.JComponent {
 	public void attemptSelect(Point2D p) {
 		Square clicked = findSquareAtPoint(p);
 		
-		if(clicked != null && clicked.hasToken()) {
+		if(clicked != null && clicked.hasToken() && clicked.getPlayer() == turn) {
 			selected = clicked;
 		}
 		
@@ -183,6 +193,9 @@ public class Board extends javax.swing.JComponent {
 			
 				//Change selected to null
 				selected = null;
+				
+				//Go to next turn
+				nextTurn();
 				
 				repaint();
 				
