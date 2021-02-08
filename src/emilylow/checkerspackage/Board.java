@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
@@ -34,9 +35,12 @@ public class Board extends javax.swing.JComponent {
 	
 	
 	//TO DO: Figure out code to allow double/triple/ect. jumps
-	//TO DO: Implement queens
+	//TO DO: !!! Figure out how to keep triangle when queen selected
 	//TO DO: Implement ability to autoskip if no move or deliberately skip turns
 	//TO DO: Implement win and new game
+	
+	//TO DO: Add visual for winning pieces
+	//TO DO: Make status window into visual interface
 	Board(StatusWindow statusWindow) {
 		
 		
@@ -84,6 +88,12 @@ public class Board extends javax.swing.JComponent {
 //					
 					g2.setColor(drawSquare.getTokenColor());
 					g2.fill(drawPotentialToken(drawSquare));
+					if(drawSquare.getQueen()) {
+						g2.setColor(Color.YELLOW);
+						
+					
+						g2.fillPolygon(drawTriange(drawSquare));
+					}
 				}
 				
 			}
@@ -92,6 +102,10 @@ public class Board extends javax.swing.JComponent {
 		if(selected != null) {
 			g2.setColor(Color.orange);
 			g2.fill(drawPotentialToken(selected));
+			if(selected.getQueen()) {
+				g2.setColor(Color.white);
+				g2.fillPolygon(drawTriange(selected));
+			}
 		}
 	}
 	
@@ -108,6 +122,11 @@ public class Board extends javax.swing.JComponent {
 				
 			}
 		}
+		
+		//TESTING ONLY
+		squares[1][2].makeQueen();
+		squares[0][5].makeQueen();
+
 	}
 	//Generate token for given square if needed, run this on each to simplify draw code
 	public Ellipse2D drawPotentialToken(Square sq) {
@@ -117,6 +136,19 @@ public class Board extends javax.swing.JComponent {
 		Ellipse2D newToken = new Ellipse2D.Double(pixelPoint[0] + TOKEN_SHRINK/2, pixelPoint[1] + TOKEN_SHRINK/2 , SIDE_LENGTH - TOKEN_SHRINK, SIDE_LENGTH - TOKEN_SHRINK);
 		
 		return newToken;
+	}
+	
+	public Polygon drawTriange(Square sq) {
+		int[] pixelPoint = convertGridtoPixel(sq.getCoord());
+		//Separating so its not unwieldy
+		int startX = pixelPoint[0];
+		int startY = pixelPoint[1];
+		
+		
+		int[] xVal = {startX + (SIDE_LENGTH/2), startX + (SIDE_LENGTH/3), startX + 2*(SIDE_LENGTH/3)};
+		int[] yVal = {startY + (SIDE_LENGTH/3), startY + 2*(SIDE_LENGTH/3), startY + 2*(SIDE_LENGTH/3)};
+		
+		return new Polygon(xVal, yVal, 3);
 	}
 	
 	public int[] convertGridtoPixel(int[] gridCoord) {
@@ -242,18 +274,33 @@ public class Board extends javax.swing.JComponent {
 			
 			if(destSquare.getActive() && destSquare.hasToken() == false) {
 				
-				if(validMove(selected.getCoord(), destSquare.getCoord(), false)) {
+				if(validMove(selected.getCoord(), destSquare.getCoord(), selected.getQueen())) {
 					
 					int currentPlayer = selected.getPlayer();
+					
+				
+					
+					
+				
+					
+					//Inform destination it has token
+					destSquare.placeToken(currentPlayer);
+					
+					//Queen checks
+					
+					if(selected.getQueen()) {
+						destSquare.makeQueen();
+					} else {
+						attemptQueen(destSquare);
+					}
 					
 					//Inform selected it is empty
 					selected.clear();
 					
-					//Inform destination it has token
-					destSquare.placeToken(currentPlayer);
-				
+					
 					//Change selected to null
 					selected = null;
+					
 					
 					//Go to next turn
 					nextTurn();
@@ -343,6 +390,16 @@ public class Board extends javax.swing.JComponent {
 		
 	}
 	
+	public void attemptQueen(Square potQ) {
+		int[] coord = potQ.getCoord();
+		
+		if(coord[1] == 0 && potQ.getPlayer() == 1) {
+			potQ.makeQueen();
+		} else if (coord[1] == (squares.length - 1) && potQ.getPlayer() == 2) {
+			potQ.makeQueen();
+		} //else, not a queen so do nothing
+	}
+	
 	public Square findSquareAtPoint(Point2D point) {
 		for(int y = 0; y < squares.length; y++) {
 			for (int x = 0; x < squares[0].length; x++) {
@@ -388,6 +445,7 @@ public class Board extends javax.swing.JComponent {
 				
 				if(selected != null) {
 					//Token selected, so repaint. 
+//					System.out.println("selected");
 					repaint();
 				}
 			}

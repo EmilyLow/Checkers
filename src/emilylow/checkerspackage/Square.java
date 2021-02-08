@@ -50,6 +50,10 @@ public class Square {
 		return coord;
 	}
 	
+	public void makeQueen() {
+		queen = true;
+	}
+	
 	public boolean getQueen() {
 		return queen; 
 	}
