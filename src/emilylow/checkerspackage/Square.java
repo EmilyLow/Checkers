@@ -11,14 +11,14 @@ public class Square {
 	private Color squareColor; 
 	private Color tokenColor; 
 	private boolean active; 
-	private boolean queen;
+	private boolean king;
 	
 	
 	public Square(int[] position, Rectangle2D rectangle) {
 		coord = position;
 		//Is it best practice to pass in values and return them, like I'm doing, or to use local variables?
 		rect = rectangle;
-		queen = false;
+		king = false;
 		
 		setActive();
 		setStartToken();
@@ -31,6 +31,7 @@ public class Square {
 	public void clear() {
 		player = 0;
 		tokenColor = null;
+		king = false;
 	}
 	
 	//Double check this code
@@ -50,12 +51,12 @@ public class Square {
 		return coord;
 	}
 	
-	public void makeQueen() {
-		queen = true;
+	public void makeKing() {
+		king = true;
 	}
 	
-	public boolean getQueen() {
-		return queen; 
+	public boolean getKing() {
+		return king; 
 	}
 	
 	public boolean hasToken() {

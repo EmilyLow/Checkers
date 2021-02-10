@@ -34,8 +34,10 @@ public class Board extends javax.swing.JComponent {
 	private int turn;
 	
 	
+	//TO DO: !!!! Stop player from jumping own pieces
+	
 	//TO DO: Figure out code to allow double/triple/ect. jumps
-	//TO DO: !!! Figure out how to keep triangle when queen selected
+
 	//TO DO: Implement ability to autoskip if no move or deliberately skip turns
 	//TO DO: Implement win and new game
 	
@@ -88,7 +90,7 @@ public class Board extends javax.swing.JComponent {
 //					
 					g2.setColor(drawSquare.getTokenColor());
 					g2.fill(drawPotentialToken(drawSquare));
-					if(drawSquare.getQueen()) {
+					if(drawSquare.getKing()) {
 						g2.setColor(Color.YELLOW);
 						
 					
@@ -102,7 +104,7 @@ public class Board extends javax.swing.JComponent {
 		if(selected != null) {
 			g2.setColor(Color.orange);
 			g2.fill(drawPotentialToken(selected));
-			if(selected.getQueen()) {
+			if(selected.getKing()) {
 				g2.setColor(Color.white);
 				g2.fillPolygon(drawTriange(selected));
 			}
@@ -123,9 +125,7 @@ public class Board extends javax.swing.JComponent {
 			}
 		}
 		
-		//TESTING ONLY
-		squares[1][2].makeQueen();
-		squares[0][5].makeQueen();
+		
 
 	}
 	//Generate token for given square if needed, run this on each to simplify draw code
@@ -176,14 +176,14 @@ public class Board extends javax.swing.JComponent {
 		return null;
 	}
 	
-	public boolean allowedDirection(int[] start, int[] end, boolean queen) {
+	public boolean allowedDirection(int[] start, int[] end, boolean king) {
 	
 		int startY = start[1];
 		int endY = end[1];
 		
 		boolean direction = false;
 		//Check for moving in correct direction
-		if(queen) {
+		if(king) {
 			direction = true;
 		} else if(turn == 1) {
 			
@@ -211,7 +211,7 @@ public class Board extends javax.swing.JComponent {
 	
 	
 	
-	public boolean validMove(int[] start, int[] end, boolean queen) {
+	public boolean validMove(int[] start, int[] end, boolean king) {
 		
 		//Breaking points into individual vars so they're easier to work with
 		int startX = start[0];
@@ -220,7 +220,7 @@ public class Board extends javax.swing.JComponent {
 		int endX = end[0];
 		int endY = end[1];
 		
-		boolean direction = allowedDirection(start, end, queen);
+		boolean direction = allowedDirection(start, end, king);
 		
 		//Check for adjacency
 		//! Not 100% sure this is correct
@@ -274,7 +274,7 @@ public class Board extends javax.swing.JComponent {
 			
 			if(destSquare.getActive() && destSquare.hasToken() == false) {
 				
-				if(validMove(selected.getCoord(), destSquare.getCoord(), selected.getQueen())) {
+				if(validMove(selected.getCoord(), destSquare.getCoord(), selected.getKing())) {
 					
 					int currentPlayer = selected.getPlayer();
 					
@@ -286,12 +286,12 @@ public class Board extends javax.swing.JComponent {
 					//Inform destination it has token
 					destSquare.placeToken(currentPlayer);
 					
-					//Queen checks
+					//King checks
 					
-					if(selected.getQueen()) {
-						destSquare.makeQueen();
+					if(selected.getKing()) {
+						destSquare.makeKing();
 					} else {
-						attemptQueen(destSquare);
+						attemptKing(destSquare);
 					}
 					
 					//Inform selected it is empty
@@ -325,7 +325,7 @@ public class Board extends javax.swing.JComponent {
 		int[] destCoord = destSquare.getCoord();
 		
 		//Check direction
-		if(allowedDirection(selected.getCoord(), destSquare.getCoord(), selected.getQueen()) ) {
+		if(allowedDirection(selected.getCoord(), destSquare.getCoord(), selected.getKing()) ) {
 			
 			//Abs value of difference needs to be two
 			//If difference is 2, add or subtract one from x & y to get inbetween coord
@@ -390,14 +390,14 @@ public class Board extends javax.swing.JComponent {
 		
 	}
 	
-	public void attemptQueen(Square potQ) {
+	public void attemptKing(Square potQ) {
 		int[] coord = potQ.getCoord();
 		
 		if(coord[1] == 0 && potQ.getPlayer() == 1) {
-			potQ.makeQueen();
+			potQ.makeKing();
 		} else if (coord[1] == (squares.length - 1) && potQ.getPlayer() == 2) {
-			potQ.makeQueen();
-		} //else, not a queen so do nothing
+			potQ.makeKing();
+		} //else, not a king so do nothing
 	}
 	
 	public Square findSquareAtPoint(Point2D point) {
