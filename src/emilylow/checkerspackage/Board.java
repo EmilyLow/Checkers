@@ -32,9 +32,12 @@ public class Board extends javax.swing.JComponent {
 	private Square selected; 
 	//Either 1 or 2
 	private int turn;
+	private int oneTotal;
+	private int twoTotal;
 	
 	
 	//TO DO: !!!! Stop player from jumping own pieces
+	//TO DO: Bug: Can't become King by jumping
 	
 	//TO DO: Figure out code to allow double/triple/ect. jumps
 
@@ -54,6 +57,8 @@ public class Board extends javax.swing.JComponent {
 		selected = null; 
 		turn = 1;
 		squares = new Square[8][8];
+		oneTotal = 0;
+		twoTotal = 0;
 		
 		//!! This feels like potentially bad practice?
 		window = statusWindow;
@@ -72,6 +77,7 @@ public class Board extends javax.swing.JComponent {
 		
 		return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	}
+
 	
 	public void paintComponent(Graphics g) {
 		
@@ -171,6 +177,14 @@ public class Board extends javax.swing.JComponent {
 		return turn;
 	}
 	
+	public int getPlayerOneTotal() {
+		return oneTotal;
+	}
+	
+	public int getPlayerTwoTotal() {
+		return twoTotal;
+	}
+	
 	public int[] drawMath() {
 		
 		return null;
@@ -238,16 +252,31 @@ public class Board extends javax.swing.JComponent {
 	}
 	
 	public void nextTurn() {
-		if(turn == 1) {
-			turn = 2;
-		} else {
-			turn = 1;
+		if (!checkWin()) {
+			if(turn == 1) {
+				turn = 2;
+			} else {
+				turn = 1;
+			}
+			window.setTurn(turn);
 		}
-		window.setTurn(turn);
+		
 	}
-	
+	//Is it bad practice to have a function that both returns a go-ahead for another function
+	//while also changing the state of the program itself?
 	public boolean checkWin() {
-		return false;
+		if(oneTotal == 12) {
+			window.showWinner(1);
+			System.out.println("Player one wins!");
+			return true;
+		} else if (twoTotal == 12) {
+			window.showWinner(2);
+			System.out.println("Player two wins!");
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 	
 	//Check if this should be using an existing copy method
@@ -349,10 +378,18 @@ public class Board extends javax.swing.JComponent {
 				
 				Square btSquare = squares[btCoord[0]][btCoord[1]];
 				
-				if(btSquare.hasToken()) {
+				if(btSquare.hasToken() && btSquare.getPlayer() != turn) {
 					
 					//Inform destination it has token
 					destSquare.placeToken(turn);
+					
+					//King checks
+					
+					if(selected.getKing()) {
+						destSquare.makeKing();
+					} else {
+						attemptKing(destSquare);
+					}
 					
 					//Inform selected it is empty
 					 selected.clear();
@@ -362,7 +399,12 @@ public class Board extends javax.swing.JComponent {
 					btSquare.clear();
 					
 					//Update score
-					window.updateClaimed(turn);
+//					window.updateClaimed(turn);
+					if(turn == 1) {
+						oneTotal++;
+					} else {
+						twoTotal++;
+					}
 					
 					nextTurn();
 					
