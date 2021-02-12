@@ -36,8 +36,6 @@ public class Board extends javax.swing.JComponent {
 	private int twoTotal;
 	
 	
-	//TO DO: !!!! Stop player from jumping own pieces
-	//TO DO: Bug: Can't become King by jumping
 	
 	//TO DO: Figure out code to allow double/triple/ect. jumps
 
