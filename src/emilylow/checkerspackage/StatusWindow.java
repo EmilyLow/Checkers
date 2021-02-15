@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class StatusWindow extends JPanel{
@@ -32,81 +33,70 @@ public class StatusWindow extends JPanel{
 	private int claimedOne;
 	private int claimedTwo;
 	
-	private JPanel leftComp;
-	private JPanel centerComp;
-	private JPanel rightComp;
+	private JPanel leftPanel;
+	private JPanel centerPanel;
+	private JPanel rightPanel;
 	
 	
 	StatusWindow(){
 		claimedOne = 0;
 		claimedTwo = 0;
 		
+		leftPanel = new JPanel();
+		centerPanel = new JPanel();
+		rightPanel = new JPanel();
+		
+		
+		
 
-		 var button = new JButton("New Game");
-		
-		this.add(button);
-		
-//		 setMaximumSize(new Dimension(1000, 200));
-		 setOpaque(true);
-		 setBackground(Color.red); 
 		 
 		
-		//One attempt
-//		leftComp = new LeftPanel();
-//		centerComp = new CenterPanel();
-//		rightComp = new RightPanel();
-//		
-//		this.add(leftComp, BorderLayout.WEST);
-//		this.add(centerComp, BorderLayout.CENTER);
-//		this.add(rightComp, BorderLayout.EAST);
-//		
-//		
-//		
-//		 var button = new JButton("New Game");
-//		 
-//		 centerComp.add(button);
-//		 
-//		 this.setOpaque(true);
-//			this.setBackground(new Color(224, 224, 224));
+		 add(leftPanel, BorderLayout.WEST);
+		 add(centerPanel, BorderLayout.CENTER);
+		 add(rightPanel, BorderLayout.EAST);
+		 
+		 var button = new JButton("New Game");
+		 
+		 JLabel p1Label = new JLabel("Player 1's score:");
+		 JLabel p1Score = new JLabel("" + claimedOne);
+		 
+		 JLabel p2Label = new JLabel("Player 2's score:");
+		 JLabel p2Score = new JLabel("" + claimedTwo);
+		 
+		 leftPanel.add(p1Label);
+		 leftPanel.add(p1Score);
+		
+		 
+		 centerPanel.add(button);
+		 
+		 rightPanel.add(p2Label);
+		 rightPanel.add(p2Score);
+		 
+		
+		 
+
 
 	}
 	
-	public void paintComponent(Graphics g) {
-		
-	      
-		Graphics2D g2 = (Graphics2D) g;
-	
-		g2.setColor(Color.blue);
-		
-		g2.fillOval(100, 50, 40, 40);
-		
-		g2.setColor(Color.white);
-		
-		g2.drawString("0", 120, 70);
-		
-		
-		g2.setColor(Color.red);
-		
-		g2.fillOval(700, 50, 40, 40);
-		
-		g2.setColor(Color.white);
-		
-		g2.drawString("0", 720, 70);
-		
-		
+//	public void paintComponent(Graphics g) {
 //		
-//		//Basic version
-//		g.drawString("Player " + turn + "'s turn", MESSAGE_X, MESSAGE_Y);
-//	      g.drawString("Pieces won:", MESSAGE_X + 200, MESSAGE_Y -40);
-//	      g.drawString("Player 1: " + board.getPlayerOneTotal(), MESSAGE_X + 200, MESSAGE_Y -20);
-//	      g.drawString("Player 2: " + board.getPlayerTwoTotal(), MESSAGE_X + 200, MESSAGE_Y );
+//		
+//
+//
+//		
+////		
+////		//Basic version
+////		g.drawString("Player " + turn + "'s turn", MESSAGE_X, MESSAGE_Y);
+////	      g.drawString("Pieces won:", MESSAGE_X + 200, MESSAGE_Y -40);
+////	      g.drawString("Player 1: " + board.getPlayerOneTotal(), MESSAGE_X + 200, MESSAGE_Y -20);
+////	      g.drawString("Player 2: " + board.getPlayerTwoTotal(), MESSAGE_X + 200, MESSAGE_Y );
+////	      
 //	      
-	      
-	      //In progress
-		
-	   
-	    
-	   }  
+//	     
+//		
+//	   
+//	    
+//	   }  
 
 	 public Dimension getPreferredSize() 
 	   {  
