@@ -37,14 +37,23 @@ public class StatusWindow extends JPanel{
 	private JPanel centerPanel;
 	private JPanel rightPanel;
 	
+	JLabel p1Score;
+	JLabel p2Score;
+	JLabel turnLabel;
+	
 	
 	StatusWindow(){
 		claimedOne = 0;
 		claimedTwo = 0;
 		
-		leftPanel = new JPanel();
-		centerPanel = new JPanel();
-		rightPanel = new JPanel();
+		setLayout(new BorderLayout());
+		
+		//Test, works fine
+		setBackground(Color.orange);
+		
+		leftPanel = new JPanel(new BorderLayout());
+		centerPanel = new JPanel(new BorderLayout());
+		rightPanel = new JPanel(new BorderLayout());
 		
 		
 		
@@ -58,26 +67,31 @@ public class StatusWindow extends JPanel{
 		 var button = new JButton("New Game");
 		 
 		 JLabel p1Label = new JLabel("Player 1's score:");
-		 JLabel p1Score = new JLabel("" + claimedOne);
+		  p1Score = new JLabel("" + claimedOne);
 		 
 		 JLabel p2Label = new JLabel("Player 2's score:");
-		 JLabel p2Score = new JLabel("" + claimedTwo);
+		  p2Score = new JLabel("" + claimedTwo);
+		  
+		 turnLabel = new JLabel("Player 1's turn");
 		 
-		 leftPanel.add(p1Label);
-		 leftPanel.add(p1Score);
+		 leftPanel.add(p1Label, BorderLayout.NORTH);
+		 leftPanel.add(p1Score, BorderLayout.SOUTH);
 		
 		 
-		 centerPanel.add(button);
+		 centerPanel.add(button, BorderLayout.NORTH);
+		 centerPanel.add(turnLabel, BorderLayout.SOUTH);
 		 
-		 rightPanel.add(p2Label);
-		 rightPanel.add(p2Score);
+		 rightPanel.add(p2Label, BorderLayout.NORTH);
+		 rightPanel.add(p2Score, BorderLayout.SOUTH);
+		 
+		 
 		 
 		
 		 
 
 
 	}
-	
+//	
 //	public void paintComponent(Graphics g) {
 //		
 //		
@@ -86,11 +100,11 @@ public class StatusWindow extends JPanel{
 //		
 ////		
 ////		//Basic version
-////		g.drawString("Player " + turn + "'s turn", MESSAGE_X, MESSAGE_Y);
-////	      g.drawString("Pieces won:", MESSAGE_X + 200, MESSAGE_Y -40);
-////	      g.drawString("Player 1: " + board.getPlayerOneTotal(), MESSAGE_X + 200, MESSAGE_Y -20);
-////	      g.drawString("Player 2: " + board.getPlayerTwoTotal(), MESSAGE_X + 200, MESSAGE_Y );
-////	      
+//		g.drawString("Player " + turn + "'s turn", MESSAGE_X, MESSAGE_Y);
+//	      g.drawString("Pieces won:", MESSAGE_X + 200, MESSAGE_Y -40);
+//	      g.drawString("Player 1: " + board.getPlayerOneTotal(), MESSAGE_X + 200, MESSAGE_Y -20);
+//	      g.drawString("Player 2: " + board.getPlayerTwoTotal(), MESSAGE_X + 200, MESSAGE_Y );
+//
 //	      
 //	     
 //		
@@ -116,7 +130,13 @@ public class StatusWindow extends JPanel{
 	
 	public void setTurn(int set) {
 		turn = set;
-		repaint();
+		//Possibly simplify and remove local var
+		claimedOne = board.getPlayerOneTotal();
+		claimedTwo = board.getPlayerTwoTotal();
+		//
+		p1Score.setText("" + claimedOne);
+		p2Score.setText("" + claimedTwo);
+//		repaint();
 	}
 	
 	public void newGame() {
@@ -127,60 +147,7 @@ public class StatusWindow extends JPanel{
 		
 	}
 	
-	//I don't know if this is close even
-	class LeftPanel extends JPanel {
-		
-		LeftPanel() {
-			 setPreferredSize(new Dimension(100,100));
-		}
-		
-		 @Override
-	        public void paintComponent(Graphics g) {
-			 Graphics2D g2 = (Graphics2D) g;
-	            super.paintComponent(g);
-	            this.setOpaque(true);
-	    		this.setBackground(new Color(224, 224, 224));
-	    		g2.drawOval(10, 10, 10, 10);
 
-	          
-	        }
-		
-	}
-class CenterPanel extends JPanel {
-		
-		CenterPanel() {
-			 setPreferredSize(new Dimension(100,100));
-		}
-		
-		 @Override
-	        public void paintComponent(Graphics g) {
-			 Graphics2D g2 = (Graphics2D) g;
-	            super.paintComponent(g);
-	            this.setOpaque(true);
-	    		this.setBackground(new Color(224, 224, 224));
-	    		g2.drawOval(10, 10, 10, 10);
 
-	          
-	        }
-		
-	}
-class RightPanel extends JPanel {
-	
-	RightPanel() {
-		 setPreferredSize(new Dimension(100,100));
-	}
-	
-	 @Override
-        public void paintComponent(Graphics g) {
-		 Graphics2D g2 = (Graphics2D) g;
-            super.paintComponent(g);
-            this.setOpaque(true);
-    		this.setBackground(new Color(224, 224, 224));
-    		g2.drawOval(10, 10, 10, 10);
-
-          
-        }
-	
-}
 
 }
