@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -48,12 +49,13 @@ public class StatusWindow extends JPanel{
 		
 		setLayout(new BorderLayout());
 		
-		//Test, works fine
-		setBackground(Color.orange);
+		//Test, works fine (or not)
+//		setBackground(Color.orange);
 		
 		leftPanel = new JPanel(new BorderLayout());
 		centerPanel = new JPanel(new BorderLayout());
 		rightPanel = new JPanel(new BorderLayout());
+		
 		
 		
 		
@@ -66,6 +68,22 @@ public class StatusWindow extends JPanel{
 		 
 		 var button = new JButton("New Game");
 		 
+
+		JPanel leftContents = new JPanel();
+		JPanel centerContents = new JPanel(new BorderLayout());
+		JPanel rightContents = new JPanel();
+		
+		JPanel centerTop = new JPanel();
+		JPanel centerBottom = new JPanel();
+		
+		centerContents.add(centerTop, BorderLayout.NORTH);
+		centerContents.add(centerBottom, BorderLayout.SOUTH);
+		
+//		leftContents.setLayout(new GridLayout(2, 1));
+//		buttonPanel.setLayout(new GridLayout(2, 1));
+//		rightContents.setLayout(new GridLayout(2, 1));
+			
+		 
 		 JLabel p1Label = new JLabel("Player 1's score:");
 		  p1Score = new JLabel("" + claimedOne);
 		 
@@ -74,18 +92,20 @@ public class StatusWindow extends JPanel{
 		  
 		 turnLabel = new JLabel("Player 1's turn");
 		 
-		 leftPanel.add(p1Label, BorderLayout.NORTH);
-		 leftPanel.add(p1Score, BorderLayout.SOUTH);
+		 leftContents.add(p1Label);
+		 leftContents.add(p1Score);
 		
 		 
-		 centerPanel.add(button, BorderLayout.NORTH);
-		 centerPanel.add(turnLabel, BorderLayout.SOUTH);
+		 centerTop.add(button);
+		 centerBottom.add(turnLabel);
 		 
-		 rightPanel.add(p2Label, BorderLayout.NORTH);
-		 rightPanel.add(p2Score, BorderLayout.SOUTH);
+		 rightContents.add(p2Label);
+		 rightContents.add(p2Score);
 		 
 		 
-		 
+		 leftPanel.add(leftContents);
+		 centerPanel.add(centerContents);
+		 rightPanel.add(rightContents);
 		
 		 
 
