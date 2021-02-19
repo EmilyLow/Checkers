@@ -168,7 +168,14 @@ public class Board extends javax.swing.JComponent {
 	}
 	
 	public void restart() {
+		squares = new Square[8][8];
+		turn = 1; 
+		oneTotal = 0;
+		twoTotal = 0;
+		selected = null;
+		setUpBoard();
 		
+		repaint();
 	}
 	
 	public int getTurn() {

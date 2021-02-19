@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -42,7 +44,8 @@ public class StatusWindow extends JPanel{
 	JLabel p2Score;
 	JLabel turnLabel;
 	
-	
+
+	//TO DO: Make New Game work
 	StatusWindow(){
 		claimedOne = 0;
 		claimedTwo = 0;
@@ -66,7 +69,7 @@ public class StatusWindow extends JPanel{
 		 add(centerPanel, BorderLayout.CENTER);
 		 add(rightPanel, BorderLayout.EAST);
 		 
-		 var button = new JButton("New Game");
+		 var resetButton = new JButton("New Game");
 		 
 
 		JPanel leftContents = new JPanel();
@@ -96,7 +99,7 @@ public class StatusWindow extends JPanel{
 		 leftContents.add(p1Score);
 		
 		 
-		 centerTop.add(button);
+		 centerTop.add(resetButton);
 		 centerBottom.add(turnLabel);
 		 
 		 rightContents.add(p2Label);
@@ -106,8 +109,10 @@ public class StatusWindow extends JPanel{
 		 leftPanel.add(leftContents);
 		 centerPanel.add(centerContents);
 		 rightPanel.add(rightContents);
-		
 		 
+		 var resetAction = new ResetAction();
+		
+		 resetButton.addActionListener(resetAction);
 
 
 	}
@@ -156,10 +161,24 @@ public class StatusWindow extends JPanel{
 		//
 		p1Score.setText("" + claimedOne);
 		p2Score.setText("" + claimedTwo);
+		
+		if(turn ==1) {
+			turnLabel.setText("Player 1's turn");
+		} else {
+			turnLabel.setText("Player 2's turn");
+		}
 //		repaint();
 	}
 	
 	public void newGame() {
+		board.restart();
+		turn = 1;
+		claimedOne = 0;
+		claimedTwo = 0;
+		
+		p1Score.setText("" + 0);
+		p2Score.setText("" + 0);
+		turnLabel.setText("Player 1's turn");
 		
 	}
 	
@@ -168,6 +187,17 @@ public class StatusWindow extends JPanel{
 	}
 	
 
-
+	private class ResetAction implements ActionListener {
+		
+		public ResetAction() {
+			
+		}
+		
+		public void actionPerformed(ActionEvent event) {
+//			System.out.println("Click");
+			newGame();
+		}
+		
+	}
 
 }
