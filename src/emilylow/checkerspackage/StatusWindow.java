@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 public class StatusWindow extends JPanel{
 	
@@ -43,6 +44,9 @@ public class StatusWindow extends JPanel{
 	JLabel p1Score;
 	JLabel p2Score;
 	JLabel turnLabel;
+	JLabel feedbackLabel;
+	
+	JToggleButton compToggle;
 	
 
 	//TO DO: Make New Game work
@@ -72,15 +76,36 @@ public class StatusWindow extends JPanel{
 		 var resetButton = new JButton("New Game");
 		 
 
-		JPanel leftContents = new JPanel();
+		JPanel leftContents = new JPanel(new BorderLayout());
 		JPanel centerContents = new JPanel(new BorderLayout());
-		JPanel rightContents = new JPanel();
+		JPanel rightContents = new JPanel(new BorderLayout());
+		
+		
+		JPanel leftTop = new JPanel();
+		JPanel leftBottom = new JPanel();
+		
+		leftContents.add(leftTop, BorderLayout.NORTH);
+		leftContents.add(leftBottom, BorderLayout.SOUTH);
+		
 		
 		JPanel centerTop = new JPanel();
+		JPanel centerMiddle = new JPanel();
 		JPanel centerBottom = new JPanel();
 		
 		centerContents.add(centerTop, BorderLayout.NORTH);
+		centerContents.add(centerMiddle, BorderLayout.CENTER);
 		centerContents.add(centerBottom, BorderLayout.SOUTH);
+		
+		
+		
+		
+
+		JPanel rightTop = new JPanel();
+		JPanel rightBottom = new JPanel();
+		
+		rightContents.add(rightTop, BorderLayout.NORTH);
+		rightContents.add(rightBottom, BorderLayout.SOUTH);
+		
 		
 //		leftContents.setLayout(new GridLayout(2, 1));
 //		buttonPanel.setLayout(new GridLayout(2, 1));
@@ -95,15 +120,34 @@ public class StatusWindow extends JPanel{
 		  
 		 turnLabel = new JLabel("Player 1's turn");
 		 
-		 leftContents.add(p1Label);
-		 leftContents.add(p1Score);
+		 feedbackLabel = new JLabel("Feedback");
+		 compToggle = new JToggleButton("Play Computer", false);
+		 
+		 //First layout
+//		 leftContents.add(p1Label);
+//		 leftContents.add(p1Score);
+//		
+//		 
+//		 centerTop.add(resetButton);
+//		 centerMiddle.add(turnLabel);
+//		 centerBottom.add(feedbackLabel);
+//		 
+//		 rightContents.add(p2Label);
+//		 rightContents.add(p2Score);
+		 
+		 //Second layout
+		 leftTop.add(resetButton);
+		 leftBottom.add(compToggle);
 		
 		 
-		 centerTop.add(resetButton);
-		 centerBottom.add(turnLabel);
+		 centerTop.add(turnLabel);
+		 centerBottom.add(feedbackLabel);
 		 
-		 rightContents.add(p2Label);
-		 rightContents.add(p2Score);
+		 rightTop.add(p1Label);
+		 rightTop.add(p1Score);
+		 rightBottom.add(p2Label);
+		 rightBottom.add(p2Score);
+		 
 		 
 		 
 		 leftPanel.add(leftContents);
