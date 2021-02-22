@@ -35,6 +35,7 @@ public class Board extends javax.swing.JComponent {
 	private int oneTotal;
 	private int twoTotal;
 	
+	private boolean gameOver;
 	
 	
 	//TO DO: Figure out code to allow double/triple/ect. jumps
@@ -61,6 +62,7 @@ public class Board extends javax.swing.JComponent {
 		//!! This feels like potentially bad practice?
 		window = statusWindow;
 		window.setBoard(this);
+		gameOver = false;
 		
 		
 		
@@ -273,10 +275,13 @@ public class Board extends javax.swing.JComponent {
 		if(oneTotal == 12) {
 			window.showWinner(1);
 			System.out.println("Player one wins!");
+			//Redundant?
+			gameOver = true;
 			return true;
 		} else if (twoTotal == 12) {
 			window.showWinner(2);
 			System.out.println("Player two wins!");
+			gameOver = true;
 			return true;
 		} else {
 			return false;
@@ -293,8 +298,15 @@ public class Board extends javax.swing.JComponent {
 	public void attemptSelect(Point2D p) {
 		Square clicked = findSquareAtPoint(p);
 		
-		if(clicked != null && clicked.hasToken() && clicked.getPlayer() == turn) {
-			selected = clicked;
+		if(clicked != null && clicked.hasToken()) {
+			
+			
+			if(clicked.getPlayer() == turn) {
+				selected = clicked;
+			}
+			else {
+				window.updateMessage("That is not your token");
+			}
 		}
 		
 	}
@@ -346,6 +358,8 @@ public class Board extends javax.swing.JComponent {
 				}
 				
 		
+			} else {
+				window.updateMessage("Invalid move");
 			}
 			
 	
@@ -420,7 +434,10 @@ public class Board extends javax.swing.JComponent {
 				
 				
 				
-			} //Else, do nothing. Do I want to return something for a failed move?
+			} else {
+				//Else, do nothing. Do I want to return something for a failed move?
+				window.updateMessage("Invalid move");
+			}
 			
 			
 			//? Should I mark a failed move somehow? Return success? 
@@ -430,7 +447,10 @@ public class Board extends javax.swing.JComponent {
 			
 			
 			
-		} //Else, do nothing
+		} else {
+			//Else, do nothing
+			window.updateMessage("Invalid move");
+		}
 		
 		
 		//Later, implement ability to check for another jump and decide if computer should auto double jump when possible.
@@ -467,35 +487,45 @@ public class Board extends javax.swing.JComponent {
 		//TO DO: Override equals? 
 		public void mousePressed(MouseEvent event)
 		{
-			Point2D point = event.getPoint();
-			//Check if a token has already been selected
-			if(selected != null) {
-				//Find clicked token
-				Square clicked = findSquareAtPoint(point);
-				if (clicked != null) {
-					
-					//Check if they are deselecting current token
-					if(clicked.getCoord().equals(selected.getCoord())) {
-						//deselect
-						selected = null;
-						repaint();
+		
+			if(gameOver) {
+				window.updateMessage("Game over. Start new game.");
+				
+			} else {
+				window.clearMessage();
+				Point2D point = event.getPoint();
+				//Check if a token has already been selected
+				if(selected != null) {
+					//Find clicked token
+					Square clicked = findSquareAtPoint(point);
+					if (clicked != null) {
+						
+						//Check if they are deselecting current token
+						if(clicked.getCoord().equals(selected.getCoord())) {
+							//deselect
+							selected = null;
+							repaint();
+						} else {
+							attemptMove(clicked);
+						}
+						
 					} else {
-						attemptMove(clicked);
+						window.updateMessage("Invalid destination");
 					}
 					
-				} //Else, invalid destination so do nothing
-				
-			}
-			else {
-				//Attempt to select token at clicked point
-				attemptSelect(point);
-				
-				if(selected != null) {
-					//Token selected, so repaint. 
-//					System.out.println("selected");
-					repaint();
+				}
+				else {
+					//Attempt to select token at clicked point
+					attemptSelect(point);
+					
+					if(selected != null) {
+						//Token selected, so repaint. 
+//						System.out.println("selected");
+						repaint();
+					}
 				}
 			}
+			
 		}
 		
 		public int[] convertCoord() {

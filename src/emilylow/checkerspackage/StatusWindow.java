@@ -120,7 +120,7 @@ public class StatusWindow extends JPanel{
 		  
 		 turnLabel = new JLabel("Player 1's turn");
 		 
-		 feedbackLabel = new JLabel("Feedback");
+		 feedbackLabel = new JLabel("");
 		 compToggle = new JToggleButton("Play Computer", false);
 		 
 		 //First layout
@@ -211,7 +211,8 @@ public class StatusWindow extends JPanel{
 		} else {
 			turnLabel.setText("Player 2's turn");
 		}
-//		repaint();
+		
+		//?? Reset info label here?
 	}
 	
 	public void newGame() {
@@ -227,7 +228,15 @@ public class StatusWindow extends JPanel{
 	}
 	
 	public void showWinner(int player) {
-		
+		turnLabel.setText("Game over! Player " + player + " wins!");
+	}
+	
+	public void clearMessage() {
+		feedbackLabel.setText("");
+	}
+	
+	public void updateMessage(String text) {
+		feedbackLabel.setText(text);
 	}
 	
 
