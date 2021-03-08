@@ -16,10 +16,8 @@ import java.lang.*;
 
 
 
-public class Board extends javax.swing.JComponent {
+public class Board {
 	
-	private static final int DEFAULT_WIDTH = 1000;
-	private static final int DEFAULT_HEIGHT = 1000;
 	
 	private static final int SIDE_LENGTH = 100;
 	private static final int OFFSET = 50;
@@ -37,14 +35,12 @@ public class Board extends javax.swing.JComponent {
 	
 	private boolean gameOver;
 	
+	private Display display;
 	
-	//TO DO: Figure out code to allow double/triple/ect. jumps
+	
 
-	//TO DO: Implement ability to autoskip if no move or deliberately skip turns
-	//TO DO: Implement win and new game
+
 	
-	//TO DO: Add visual for winning pieces
-	//TO DO: Make status window into visual interface
 	Board(StatusWindow statusWindow) {
 		
 		
@@ -67,55 +63,17 @@ public class Board extends javax.swing.JComponent {
 		
 		
 		setUpBoard();
-		addMouseListener(new ClickHandler());
-		repaint();
+
+		
+		display = new Display(squares, selected, this);
 		
 	}
 	
-	//!Look at the details here later;
-	public Dimension getPreferredSize() {
-		
-		return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	public Display getDisplay() {
+		return display;
 	}
-
 	
-	public void paintComponent(Graphics g) {
-		
-		var g2 = (Graphics2D) g;
-
-		
-		for (int y = 0; y < squares.length; y++) {
-			for(int x = 0; x < squares[0].length; x++) {
-
-				Square drawSquare = squares[x][y];
-
-				g2.setColor(drawSquare.getSquareColor());
-				g2.fill(drawSquare.getRect());
-				
-				if(drawSquare.hasToken()) {
-//					
-					g2.setColor(drawSquare.getTokenColor());
-					g2.fill(drawPotentialToken(drawSquare));
-					if(drawSquare.getKing()) {
-						g2.setColor(Color.YELLOW);
-						
-					
-						g2.fillPolygon(drawTriange(drawSquare));
-					}
-				}
-				
-			}
-		}
-		
-		if(selected != null) {
-			g2.setColor(Color.orange);
-			g2.fill(drawPotentialToken(selected));
-			if(selected.getKing()) {
-				g2.setColor(Color.white);
-				g2.fillPolygon(drawTriange(selected));
-			}
-		}
-	}
+	
 	
 	
 	public void setUpBoard() {
@@ -134,29 +92,7 @@ public class Board extends javax.swing.JComponent {
 		
 
 	}
-	//Generate token for given square if needed, run this on each to simplify draw code
-	public Ellipse2D drawPotentialToken(Square sq) {
 
-		int[] pixelPoint = convertGridtoPixel(sq.getCoord());
-		
-		Ellipse2D newToken = new Ellipse2D.Double(pixelPoint[0] + TOKEN_SHRINK/2, pixelPoint[1] + TOKEN_SHRINK/2 , SIDE_LENGTH - TOKEN_SHRINK, SIDE_LENGTH - TOKEN_SHRINK);
-		
-		return newToken;
-	}
-	
-	public Polygon drawTriange(Square sq) {
-		int[] pixelPoint = convertGridtoPixel(sq.getCoord());
-		//Separating so its not unwieldy
-		int startX = pixelPoint[0];
-		int startY = pixelPoint[1];
-		
-		
-		int[] xVal = {startX + (SIDE_LENGTH/2), startX + (SIDE_LENGTH/3), startX + 2*(SIDE_LENGTH/3)};
-		int[] yVal = {startY + (SIDE_LENGTH/3), startY + 2*(SIDE_LENGTH/3), startY + 2*(SIDE_LENGTH/3)};
-		
-		return new Polygon(xVal, yVal, 3);
-	}
-	
 	public int[] convertGridtoPixel(int[] gridCoord) {
 		int gridX = gridCoord[0];
 		int gridY = gridCoord[1];
@@ -177,7 +113,7 @@ public class Board extends javax.swing.JComponent {
 		selected = null;
 		setUpBoard();
 		
-		repaint();
+		display.updateDisplay(squares, selected);
 	}
 	
 	public int getTurn() {
@@ -192,10 +128,7 @@ public class Board extends javax.swing.JComponent {
 		return twoTotal;
 	}
 	
-	public int[] drawMath() {
-		
-		return null;
-	}
+	
 	
 	public boolean allowedDirection(int[] start, int[] end, boolean king) {
 	
@@ -244,7 +177,7 @@ public class Board extends javax.swing.JComponent {
 		boolean direction = allowedDirection(start, end, king);
 		
 		//Check for adjacency
-		//! Not 100% sure this is correct
+		
 		boolean adjacency;
 		if(Math.abs(startX - endX) <= 1 && Math.abs(startY - endY) <= 1) {
 			adjacency = true;
@@ -289,11 +222,7 @@ public class Board extends javax.swing.JComponent {
 		
 	}
 	
-	//Check if this should be using an existing copy method
-	public Board deepCopy() {
-			
-		return null;
-	}
+
 	
 	public void attemptSelect(Point2D p) {
 		Square clicked = findSquareAtPoint(p);
@@ -351,7 +280,10 @@ public class Board extends javax.swing.JComponent {
 					//Go to next turn
 					nextTurn();
 					
-					repaint();
+					//!! Change to return true and have calling function call move
+					//!! Or something
+//					repaint();
+					display.updateDisplay(squares, selected);
 					
 				} else {
 					attemptJump(destSquare);
@@ -427,7 +359,10 @@ public class Board extends javax.swing.JComponent {
 					
 					nextTurn();
 					
-					repaint();
+					//!!Make return true and have calling function take action (I think)
+					display.updateDisplay(squares, selected);
+					
+//					repaint();
 					
 					
 				} //Else, do nothing
@@ -480,57 +415,53 @@ public class Board extends javax.swing.JComponent {
 		
 	}
 	
-	
-	private class ClickHandler extends MouseAdapter 
-	{
-		
-		//TO DO: Override equals? 
-		public void mousePressed(MouseEvent event)
-		{
-		
-			if(gameOver) {
-				window.updateMessage("Game over. Start new game.");
-				
-			} else {
-				window.clearMessage();
-				Point2D point = event.getPoint();
-				//Check if a token has already been selected
-				if(selected != null) {
-					//Find clicked token
-					Square clicked = findSquareAtPoint(point);
-					if (clicked != null) {
-						
-						//Check if they are deselecting current token
-						if(clicked.getCoord().equals(selected.getCoord())) {
-							//deselect
-							selected = null;
-							repaint();
-						} else {
-							attemptMove(clicked);
-						}
-						
+	public void reportClick(MouseEvent event) {
+		if(gameOver) {
+			window.updateMessage("Game over. Start new game.");
+			
+		} else {
+			window.clearMessage();
+			Point2D point = event.getPoint();
+			//Check if a token has already been selected
+			if(selected != null) {
+				//Find clicked token
+				Square clicked = findSquareAtPoint(point);
+				if (clicked != null) {
+					
+					//Check if they are deselecting current token
+					if(clicked.getCoord().equals(selected.getCoord())) {
+						//deselect
+						selected = null;
+
+						//!!Edit what this does, where logic is stored
+						display.updateDisplay(squares, selected);
 					} else {
-						window.updateMessage("Invalid destination");
+						attemptMove(clicked);
 					}
 					
+				} else {
+					window.updateMessage("Invalid destination");
 				}
-				else {
-					//Attempt to select token at clicked point
-					attemptSelect(point);
+				
+			}
+			else {
+				//Attempt to select token at clicked point
+				attemptSelect(point);
+				
+				if(selected != null) {
+					//Token selected, so repaint. 
+
+
 					
-					if(selected != null) {
-						//Token selected, so repaint. 
-//						System.out.println("selected");
-						repaint();
-					}
+					//!!Edit what this does, where logic is stored
+				
+					display.updateDisplay(squares, selected);
 				}
 			}
-			
-		}
-		
-		public int[] convertCoord() {
-			
-			return null;
 		}
 	}
+	
+	
+
+
 }

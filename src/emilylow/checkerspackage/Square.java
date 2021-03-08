@@ -135,4 +135,13 @@ public class Square {
 		
 		
 	}
+	
+	public String toString() {
+		
+		String line1 = "Position: " + coord[0] + ":" + coord[1] + "";
+		String line2 = "Player: " + player;
+		String line3 = "King: " + king;
+		
+		return line1 + "\n" + line2 + "\n" + line3 + "\n";
+	}
 }
