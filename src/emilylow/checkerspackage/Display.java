@@ -42,10 +42,16 @@ public class Display extends javax.swing.JComponent {
 		
 	}
 	
-	//Note, I may not have to update the squares array at all (because pointers) until the board restarts
-	public void updateDisplay(Square[][] squares, Square chosen) {
-		displaySquares = squares;
+	
+	public void updateDisplay(Square chosen) {
+
 		selected = chosen;
+		repaint();
+	}
+	
+	public void newGame(Square[][] squares) {
+		selected = null;
+		displaySquares = squares;
 		repaint();
 	}
 

@@ -113,7 +113,7 @@ public class Board {
 		selected = null;
 		setUpBoard();
 		
-		display.updateDisplay(squares, selected);
+		display.newGame(squares);
 	}
 	
 	public int getTurn() {
@@ -283,7 +283,7 @@ public class Board {
 					//!! Change to return true and have calling function call move
 					//!! Or something
 //					repaint();
-					display.updateDisplay(squares, selected);
+					display.updateDisplay(selected);
 					
 				} else {
 					attemptJump(destSquare);
@@ -360,7 +360,7 @@ public class Board {
 					nextTurn();
 					
 					//!!Make return true and have calling function take action (I think)
-					display.updateDisplay(squares, selected);
+					display.updateDisplay(selected);
 					
 //					repaint();
 					
@@ -434,7 +434,7 @@ public class Board {
 						selected = null;
 
 						//!!Edit what this does, where logic is stored
-						display.updateDisplay(squares, selected);
+						display.updateDisplay(selected);
 					} else {
 						attemptMove(clicked);
 					}
@@ -455,7 +455,7 @@ public class Board {
 					
 					//!!Edit what this does, where logic is stored
 				
-					display.updateDisplay(squares, selected);
+					display.updateDisplay(selected);
 				}
 			}
 		}
