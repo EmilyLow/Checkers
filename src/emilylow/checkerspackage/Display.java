@@ -132,16 +132,44 @@ public class Display extends javax.swing.JComponent {
 		int[] pixelPoint = {xPoint, yPoint};
 		return pixelPoint;
 	}
+	
+	public Square findSquareAtPoint(Point2D point) {
+		for(int y = 0; y < displaySquares.length; y++) {
+			for (int x = 0; x < displaySquares[0].length; x++) {
+				
+				Square checking = displaySquares[x][y];
+				
+				if(checking.getRect().contains(point)) return checking;
+			}
+		}
+		return null;
+		
+	}
 
 	private class ClickHandler extends MouseAdapter 
 	{
 		
 		//TO DO: Override equals? 
-		public void mousePressed(MouseEvent event)
-		{
+//		public void mousePressed(MouseEvent event)
+//		{
+//		
+//			board.reportClick(event);
+//			
+//			
+//			
+//		}
 		
-			board.reportClick(event);
+		public void mousePressed(MouseEvent event) {
+			Point2D point = event.getPoint();
+			Square clicked = findSquareAtPoint(point);
 			
+			if(clicked != null) {
+				board.attemptAction(clicked.getCoord());
+			} else {
+				//!!! I'm unsure if this should be a thing.
+				//For now it needs to be so StatusWindow updates.
+				board.attemptAction(null);
+			}
 			
 		}
 		

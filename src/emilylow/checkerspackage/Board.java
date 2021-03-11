@@ -36,9 +36,6 @@ public class Board {
 	private boolean gameOver;
 	
 	private Display display;
-	
-	
-
 
 	
 	Board(StatusWindow statusWindow) {
@@ -55,24 +52,17 @@ public class Board {
 		oneTotal = 0;
 		twoTotal = 0;
 		
-		//!! This feels like potentially bad practice?
 		window = statusWindow;
 		window.setBoard(this);
 		gameOver = false;
 		
-		
-		
 		setUpBoard();
 
-		
 		display = new Display(squares, selected, this);
 		
 	}
 	
-	public Display getDisplay() {
-		return display;
-	}
-	
+
 	
 	
 	
@@ -88,8 +78,6 @@ public class Board {
 				
 			}
 		}
-		
-		
 
 	}
 
@@ -116,16 +104,37 @@ public class Board {
 		display.newGame(squares);
 	}
 	
-	public int getTurn() {
-		return turn;
+	public void nextTurn() {
+		if (!checkWin()) {
+			if(turn == 1) {
+				turn = 2;
+			} else {
+				turn = 1;
+			}
+			window.setTurn(turn);
+		}
+		
 	}
 	
-	public int getPlayerOneTotal() {
-		return oneTotal;
-	}
-	
-	public int getPlayerTwoTotal() {
-		return twoTotal;
+
+	//Is it bad practice to have a function that both returns a go-ahead for another function
+	//while also changing the state of the program itself?
+	public boolean checkWin() {
+		if(oneTotal == 12) {
+			window.showWinner(1);
+			System.out.println("Player one wins!");
+			//Redundant?
+			gameOver = true;
+			return true;
+		} else if (twoTotal == 12) {
+			window.showWinner(2);
+			System.out.println("Player two wins!");
+			gameOver = true;
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 	
 	
@@ -191,40 +200,11 @@ public class Board {
 		return direction && adjacency;
 	}
 	
-	public void nextTurn() {
-		if (!checkWin()) {
-			if(turn == 1) {
-				turn = 2;
-			} else {
-				turn = 1;
-			}
-			window.setTurn(turn);
-		}
-		
-	}
-	//Is it bad practice to have a function that both returns a go-ahead for another function
-	//while also changing the state of the program itself?
-	public boolean checkWin() {
-		if(oneTotal == 12) {
-			window.showWinner(1);
-			System.out.println("Player one wins!");
-			//Redundant?
-			gameOver = true;
-			return true;
-		} else if (twoTotal == 12) {
-			window.showWinner(2);
-			System.out.println("Player two wins!");
-			gameOver = true;
-			return true;
-		} else {
-			return false;
-		}
-		
-	}
+	
 	
 
 	
-	public void attemptSelect(Point2D p) {
+	public void attemptClickSelect(Point2D p) {
 		Square clicked = findSquareAtPoint(p);
 		
 		if(clicked != null && clicked.hasToken()) {
@@ -240,12 +220,59 @@ public class Board {
 		
 	}
 	
+	//!Rename?
+	//Incomplete
+	public boolean attemptGridSelect(int[] coord) {
+		Square chosen = squares[coord[0]][coord[1]];
+		
+		if(chosen.hasToken()) {
+			
+			//Check if it needs to deselect(?)
+			//But that might return weirdness if the computer 
+			//is relying on getting a true from this in order to try next moves?
+			// If selected == true, test deselect? 
+			
+			
+			if(chosen.getPlayer() == turn) {
+				selected = chosen;
+				if(display != null) {
+					display.updateDisplay(selected);
+				}
+				return true;
+			} else {
+				return false;
+			}
+			
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean attemptDeselect(int[] coord) {
+		
+		if(coord.equals(selected.getCoord())) {
+			
+			selected = null;
+
+			//!!Edit what this does, where logic is stored
+			if(window != null) {
+				display.updateDisplay(selected);
+			}
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	
-	public void attemptMove(Square destSquare) {
+	
+	public boolean attemptMove(int[] coord) {
 		
 			//Check that DESTINATION is an active square and empty
 			//Do this earlier on? 
+		
+			Square destSquare = squares[coord[0]][coord[1]];
 			
 			if(destSquare.getActive() && destSquare.hasToken() == false) {
 				
@@ -282,30 +309,40 @@ public class Board {
 					
 					//!! Change to return true and have calling function call move
 					//!! Or something
-//					repaint();
-					display.updateDisplay(selected);
+					if (display != null) {
+						display.updateDisplay(selected);
+					}
+					
+					return true;
 					
 				} else {
-					attemptJump(destSquare);
+					return attemptJump(coord);
 				}
 				
 		
 			} else {
-				window.updateMessage("Invalid move");
+				
+				if(window != null) {
+					window.updateMessage("Invalid move");
+				}
+				
+				return false;
 			}
 			
 	
 	}
 	
-	public void attemptJump(Square destSquare) {
+	public boolean attemptJump(int[] coord) {
 		//Checks for single jump initially, with potential ability to iterate later
 		
 		
+		
 		int[] currentCoord = selected.getCoord();
-		int[] destCoord = destSquare.getCoord();
+		int[] destCoord = coord;
+		Square destSquare = squares[coord[0]][coord[1]];
 		
 		//Check direction
-		if(allowedDirection(selected.getCoord(), destSquare.getCoord(), selected.getKing()) ) {
+		if(allowedDirection(currentCoord, destCoord, selected.getKing()) ) {
 			
 			//Abs value of difference needs to be two
 			//If difference is 2, add or subtract one from x & y to get inbetween coord
@@ -359,32 +396,36 @@ public class Board {
 					
 					nextTurn();
 					
-					//!!Make return true and have calling function take action (I think)
-					display.updateDisplay(selected);
 					
-//					repaint();
+					if(display!= null) {
+						display.updateDisplay(selected);
+					}
+
+					return true;
 					
-					
-				} //Else, do nothing
-				
+				} else {
+					//!! If there's an error it might be here
+					return false;
+				}
 				
 				
 			} else {
 				//Else, do nothing. Do I want to return something for a failed move?
+				if (window != null) {
+					window.updateMessage("Invalid move");
+				}
+				
+				return false;
+			}
+
+			
+		} else {
+			
+			if (window != null) {
 				window.updateMessage("Invalid move");
 			}
 			
-			
-			//? Should I mark a failed move somehow? Return success? 
-			
-			
-		
-			
-			
-			
-		} else {
-			//Else, do nothing
-			window.updateMessage("Invalid move");
+			return false;
 		}
 		
 		
@@ -402,6 +443,7 @@ public class Board {
 		} //else, not a king so do nothing
 	}
 	
+	//??? Delete from here?
 	public Square findSquareAtPoint(Point2D point) {
 		for(int y = 0; y < squares.length; y++) {
 			for (int x = 0; x < squares[0].length; x++) {
@@ -415,53 +457,118 @@ public class Board {
 		
 	}
 	
-	public void reportClick(MouseEvent event) {
+	
+	
+//	public void reportClick(MouseEvent event) {
+//		if(gameOver) {
+//			window.updateMessage("Game over. Start new game.");
+//			
+//		} else {
+//			window.clearMessage();
+//			Point2D point = event.getPoint();
+//			//Check if a token has already been selected
+//			if(selected != null) {
+//				//Find clicked token
+//				Square clicked = findSquareAtPoint(point);
+//				if (clicked != null) {
+//					
+//					//Check if they are deselecting current token
+//					if(clicked.getCoord().equals(selected.getCoord())) {
+//						//deselect
+//						selected = null;
+//
+//						//!!Edit what this does, where logic is stored
+//						display.updateDisplay(selected);
+//					} else {
+//						attemptMove(clicked);
+//					}
+//					
+//				} else {
+//					window.updateMessage("Invalid destination");
+//				}
+//				
+//			}
+//			else {
+//				//Attempt to select token at clicked point
+//				attemptClickSelect(point);
+//				
+//				if(selected != null) {
+//					//Token selected, so repaint. 
+//
+//
+//					
+//					//!!Edit what this does, where logic is stored
+//				
+//					display.updateDisplay(selected);
+//				}
+//			}
+//		}
+//	}
+	
+	//More general version of report click that both CheckersFrame and Computer can call
+	
+	
+	public boolean attemptAction(int[] coord) {
+		
+		//May need to change how gameover works. 
 		if(gameOver) {
-			window.updateMessage("Game over. Start new game.");
 			
+			if (window != null) {
+				window.updateMessage("Game over. Start new game.");
+			}
+			
+			return false;
 		} else {
-			window.clearMessage();
-			Point2D point = event.getPoint();
-			//Check if a token has already been selected
-			if(selected != null) {
-				//Find clicked token
-				Square clicked = findSquareAtPoint(point);
-				if (clicked != null) {
-					
-					//Check if they are deselecting current token
-					if(clicked.getCoord().equals(selected.getCoord())) {
-						//deselect
-						selected = null;
-
-						//!!Edit what this does, where logic is stored
-						display.updateDisplay(selected);
-					} else {
-						attemptMove(clicked);
-					}
+			
+			if(window != null) {
+				window.clearMessage();
+			}
+			//!! Null check currently exists for StatusWindow. May remove
+			if(coord != null) {
+				
+				if(selected == null) {
+				
+					return attemptGridSelect(coord);
 					
 				} else {
+					
+					//? Bad form to change status in first part of if statement?
+					if (attemptDeselect(coord)) {
+						return true;
+					} else {
+						return attemptMove(coord);
+					}
+					
+				}
+				
+				
+			} else {
+				if(window != null) {
 					window.updateMessage("Invalid destination");
 				}
-				
-			}
-			else {
-				//Attempt to select token at clicked point
-				attemptSelect(point);
-				
-				if(selected != null) {
-					//Token selected, so repaint. 
-
-
-					
-					//!!Edit what this does, where logic is stored
-				
-					display.updateDisplay(selected);
-				}
+				return false;
 			}
 		}
+		
+		
 	}
 	
 	
+	public Display getDisplay() {
+		return display;
+	}
+	
+	public int getTurn() {
+		return turn;
+	}
+	
+	public int getPlayerOneTotal() {
+		return oneTotal;
+	}
+	
+	public int getPlayerTwoTotal() {
+		return twoTotal;
+	}
 
 
 }
