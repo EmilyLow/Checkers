@@ -35,12 +35,18 @@ public class Board {
 	
 	private boolean gameOver;
 	
-	private Display display;
 
+	
+
+	private Display display;
+	
+	
+	//Possibly make the declaration of this more obvious, and not just implied by if a statusWindow is given
+	boolean primary;
 	
 	Board(StatusWindow statusWindow) {
 		
-		
+		primary = true;
 		
 		
 		//This is temporary, before Computer is implemented
@@ -59,6 +65,30 @@ public class Board {
 		setUpBoard();
 
 		display = new Display(squares, selected, this);
+		
+	}
+	
+	/* Clone constructor. Should this be done differently? Like, making and then setting after? 
+	 * Or passing in a single board and using get on all of its elements? */
+	Board(Square[][] squares, int turn, int oneTotal, int twoTotal) {
+		primary = false;
+		
+		//!!! Temp
+		pvp = false;
+		
+		//!!! Consider if it should be able to start a board with a pre-selected piece
+		selected = null;
+	
+		this.turn = turn;
+		this.squares = squares;
+		this.oneTotal = oneTotal;
+		this.twoTotal = twoTotal;
+		
+		gameOver = false;
+		
+		window = null;
+		display = null;
+		
 		
 	}
 	
@@ -204,21 +234,7 @@ public class Board {
 	
 
 	
-	public void attemptClickSelect(Point2D p) {
-		Square clicked = findSquareAtPoint(p);
-		
-		if(clicked != null && clicked.hasToken()) {
-			
-			
-			if(clicked.getPlayer() == turn) {
-				selected = clicked;
-			}
-			else {
-				window.updateMessage("That is not your token");
-			}
-		}
-		
-	}
+	
 	
 	//!Rename?
 	//Incomplete
@@ -429,8 +445,12 @@ public class Board {
 		}
 		
 		
-		//Later, implement ability to check for another jump and decide if computer should auto double jump when possible.
 		
+	}
+	
+	public boolean attemptDoubleJump() {
+		//To attempt after jumping returns true
+		return false;
 	}
 	
 	public void attemptKing(Square potQ) {
@@ -443,69 +463,8 @@ public class Board {
 		} //else, not a king so do nothing
 	}
 	
-	//??? Delete from here?
-	public Square findSquareAtPoint(Point2D point) {
-		for(int y = 0; y < squares.length; y++) {
-			for (int x = 0; x < squares[0].length; x++) {
-				
-				Square checking = squares[x][y];
-				
-				if(checking.getRect().contains(point)) return checking;
-			}
-		}
-		return null;
-		
-	}
 	
-	
-	
-//	public void reportClick(MouseEvent event) {
-//		if(gameOver) {
-//			window.updateMessage("Game over. Start new game.");
-//			
-//		} else {
-//			window.clearMessage();
-//			Point2D point = event.getPoint();
-//			//Check if a token has already been selected
-//			if(selected != null) {
-//				//Find clicked token
-//				Square clicked = findSquareAtPoint(point);
-//				if (clicked != null) {
-//					
-//					//Check if they are deselecting current token
-//					if(clicked.getCoord().equals(selected.getCoord())) {
-//						//deselect
-//						selected = null;
-//
-//						//!!Edit what this does, where logic is stored
-//						display.updateDisplay(selected);
-//					} else {
-//						attemptMove(clicked);
-//					}
-//					
-//				} else {
-//					window.updateMessage("Invalid destination");
-//				}
-//				
-//			}
-//			else {
-//				//Attempt to select token at clicked point
-//				attemptClickSelect(point);
-//				
-//				if(selected != null) {
-//					//Token selected, so repaint. 
-//
-//
-//					
-//					//!!Edit what this does, where logic is stored
-//				
-//					display.updateDisplay(selected);
-//				}
-//			}
-//		}
-//	}
-	
-	//More general version of report click that both CheckersFrame and Computer can call
+
 	
 	
 	public boolean attemptAction(int[] coord) {
