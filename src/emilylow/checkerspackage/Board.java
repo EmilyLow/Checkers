@@ -92,7 +92,27 @@ public class Board {
 		
 	}
 	
+	public MockBoard makeMockBoard(int iter) {
+		
+	
+		
+		MockBoard mockBoard = new MockBoard(copySquares(squares), turn, oneTotal, twoTotal, iter);
+		
+		return mockBoard;
+	}
 
+	private Square[][] copySquares(Square[][] startSquares) {
+		Square [][] newSquares = new Square[8][8];
+		
+		for(int y = 0; y < startSquares.length; y++) { 
+			for(int x = 0; x < startSquares.length; x++) {
+				newSquares[x][y] = startSquares[x][y].copySquare();
+			}
+		}
+		
+		
+		return null;
+	}
 	
 	
 	
