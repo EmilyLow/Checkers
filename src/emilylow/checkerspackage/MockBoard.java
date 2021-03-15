@@ -21,6 +21,8 @@ public class MockBoard extends Board {
 		// TODO Auto-generated constructor stub
 	}
 	
+	
+	//Start as finding one move ahead
 	public int[][] findBestMove() {
 		
 		

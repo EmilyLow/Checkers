@@ -26,10 +26,12 @@ public class Board {
 	
 	private Square[][] squares;
 	private StatusWindow window;
-	private boolean pvp;
+	private boolean compOn;
 	private Square selected; 
 	//Either 1 or 2
 	private int turn;
+	//Is this the right way to do this?
+	private boolean compTurn;
 	private int oneTotal;
 	private int twoTotal;
 	
@@ -50,7 +52,8 @@ public class Board {
 		
 		
 		//This is temporary, before Computer is implemented
-		pvp = false;
+		compOn = false;
+		compTurn = false;
 		
 		selected = null; 
 		turn = 1;
@@ -74,7 +77,7 @@ public class Board {
 		primary = false;
 		
 		//!!! Temp
-		pvp = false;
+		compOn = false;
 		
 		//!!! Consider if it should be able to start a board with a pre-selected piece
 		selected = null;
@@ -154,14 +157,27 @@ public class Board {
 		display.newGame(squares);
 	}
 	
+	public void toggleCompOn() {
+		compOn = !compOn;
+		restart();
+//		System.out.println(compOn);
+	}
+	
 	public void nextTurn() {
 		if (!checkWin()) {
 			if(turn == 1) {
 				turn = 2;
+				if(compOn) {
+					compTurn = true;
+					//Alert computer to take turn
+				}
 			} else {
 				turn = 1;
+				if(compOn) {
+					compTurn = false;
+				}
 			}
-			window.setTurn(turn);
+			window.setTurn(turn, compTurn);
 		}
 		
 	}
@@ -272,7 +288,7 @@ public class Board {
 			if(chosen.getPlayer() == turn) {
 				selected = chosen;
 				if(display != null) {
-					display.updateDisplay(selected);
+					display.updateDisplay(selected, compTurn);
 				}
 				return true;
 			} else {
@@ -292,7 +308,7 @@ public class Board {
 
 			//!!Edit what this does, where logic is stored
 			if(window != null) {
-				display.updateDisplay(selected);
+				display.updateDisplay(selected, compTurn);
 			}
 			
 			return true;
@@ -346,7 +362,7 @@ public class Board {
 					//!! Change to return true and have calling function call move
 					//!! Or something
 					if (display != null) {
-						display.updateDisplay(selected);
+						display.updateDisplay(selected, compTurn);
 					}
 					
 					return true;
@@ -434,7 +450,7 @@ public class Board {
 					
 					
 					if(display!= null) {
-						display.updateDisplay(selected);
+						display.updateDisplay(selected, compTurn);
 					}
 
 					return true;
@@ -547,6 +563,10 @@ public class Board {
 	
 	public int getPlayerTwoTotal() {
 		return twoTotal;
+	}
+	
+	public boolean getCompOn() {
+		return compOn;
 	}
 
 

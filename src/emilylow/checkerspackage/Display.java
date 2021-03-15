@@ -27,6 +27,7 @@ public class Display extends javax.swing.JComponent {
 	private Square selected; 
 	
 	private Board board;
+	private boolean compTurn;
 	
 	
 	public Display(Square[][] squares, Square chosen, Board passedBoard) {
@@ -35,6 +36,7 @@ public class Display extends javax.swing.JComponent {
 		board = passedBoard;
 		displaySquares = squares;
 		selected = chosen;
+		compTurn = false;
 		
 		addMouseListener(new ClickHandler());
 		
@@ -43,9 +45,10 @@ public class Display extends javax.swing.JComponent {
 	}
 	
 	
-	public void updateDisplay(Square chosen) {
+	public void updateDisplay(Square chosen, Boolean compTurn) {
 
 		selected = chosen;
+		this.compTurn = compTurn;
 		repaint();
 	}
 	
@@ -160,16 +163,21 @@ public class Display extends javax.swing.JComponent {
 //		}
 		
 		public void mousePressed(MouseEvent event) {
-			Point2D point = event.getPoint();
-			Square clicked = findSquareAtPoint(point);
 			
-			if(clicked != null) {
-				board.attemptAction(clicked.getCoord());
-			} else {
-				//!!! I'm unsure if this should be a thing.
-				//For now it needs to be so StatusWindow updates.
-				board.attemptAction(null);
+			//Clicking board not allowed during computer's turn
+			if( !compTurn) {
+				Point2D point = event.getPoint();
+				Square clicked = findSquareAtPoint(point);
+				
+				if(clicked != null) {
+					board.attemptAction(clicked.getCoord());
+				} else {
+					//!!! I'm unsure if this should be a thing.
+					//For now it needs to be so StatusWindow updates.
+					board.attemptAction(null);
+				}
 			}
+			
 			
 		}
 		
