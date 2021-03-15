@@ -164,7 +164,7 @@ public class StatusWindow extends JPanel{
 	
 	public void setTurn(int set, boolean compTurn) {
 		turn = set;
-		System.out.println(compTurn);
+//		System.out.println(compTurn);
 		//Possibly simplify and remove local var
 		claimedOne = board.getPlayerOneTotal();
 		claimedTwo = board.getPlayerTwoTotal();

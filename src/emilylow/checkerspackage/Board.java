@@ -41,6 +41,7 @@ public class Board {
 	
 
 	private Display display;
+	private CompPlayer compPlayer;
 	
 	
 	//Possibly make the declaration of this more obvious, and not just implied by if a statusWindow is given
@@ -68,6 +69,7 @@ public class Board {
 		setUpBoard();
 
 		display = new Display(squares, selected, this);
+		compPlayer = new CompPlayer(this);
 		
 	}
 	
@@ -170,6 +172,9 @@ public class Board {
 				if(compOn) {
 					compTurn = true;
 					//Alert computer to take turn
+					
+					compPlayer.testTriggerTurn();
+					
 				}
 			} else {
 				turn = 1;
@@ -275,6 +280,7 @@ public class Board {
 	//!Rename?
 	//Incomplete
 	public boolean attemptGridSelect(int[] coord) {
+		System.out.println("AttemptGridSelect");
 		Square chosen = squares[coord[0]][coord[1]];
 		
 		if(chosen.hasToken()) {
@@ -320,6 +326,7 @@ public class Board {
 	
 	
 	public boolean attemptMove(int[] coord) {
+		System.out.println("Attempt move");
 		
 			//Check that DESTINATION is an active square and empty
 			//Do this earlier on? 
@@ -357,7 +364,7 @@ public class Board {
 					
 					
 					//Go to next turn
-					nextTurn();
+//					nextTurn();
 					
 					//!! Change to return true and have calling function call move
 					//!! Or something
@@ -365,6 +372,7 @@ public class Board {
 						display.updateDisplay(selected, compTurn);
 					}
 					
+					nextTurn();
 					return true;
 					
 				} else {
