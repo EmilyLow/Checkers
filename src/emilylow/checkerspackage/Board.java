@@ -110,7 +110,7 @@ public class Board {
 		return null;
 	}
 
-	public void setUpBoard() {
+	private void setUpBoard() {
 		for (int y = 0; y < squares.length; y++) {
 			for (int x = 0; x < squares[0].length; x++) {
 				int[] gridCoord = { x, y };
@@ -126,7 +126,7 @@ public class Board {
 
 	}
 
-	public int[] convertGridtoPixel(int[] gridCoord) {
+	private int[] convertGridtoPixel(int[] gridCoord) {
 		int gridX = gridCoord[0];
 		int gridY = gridCoord[1];
 
@@ -197,7 +197,7 @@ public class Board {
 
 	}
 
-	public boolean allowedDirection(int[] start, int[] end, boolean king) {
+	private boolean allowedDirection(int[] start, int[] end, boolean king) {
 
 		int startY = start[1];
 		int endY = end[1];
@@ -228,7 +228,7 @@ public class Board {
 		return direction;
 	}
 	
-	public int[] findBtCoord(int[] start, int[] end) {
+	private int[] findBtCoord(int[] start, int[] end) {
 		int[] btCoord = new int[2];
 
 		
@@ -246,57 +246,12 @@ public class Board {
 		return btCoord;
 	}
 
-	public boolean outOfBounds(int[] coord) {
+	private boolean outOfBounds(int[] coord) {
 
 		if (0 <= coord[0] && coord[0] <= 7 && 0 <= coord[1] && coord[1] <= 7) {
 			return false;
 		} else {
 			return true;
-		}
-	}
-
-	// !Rename?
-	// Incomplete
-	public boolean attemptGridSelect(int[] coord) {
-		// System.out.println("AttemptGridSelect");
-		Square chosen = squares[coord[0]][coord[1]];
-
-		if (chosen.hasToken()) {
-
-			// Check if it needs to deselect(?)
-			// But that might return weirdness if the computer
-			// is relying on getting a true from this in order to try next moves?
-			// If selected == true, test deselect?
-
-			if (chosen.getPlayer() == turn) {
-				selected = chosen;
-				if (display != null) {
-					display.updateDisplay(selected, compTurn);
-				}
-				return true;
-			} else {
-				return false;
-			}
-
-		} else {
-			return false;
-		}
-	}
-
-	public boolean attemptDeselect(int[] coord) {
-
-		if (coord.equals(selected.getCoord())) {
-
-			selected = null;
-
-			// !!Edit what this does, where logic is stored
-			if (window != null) {
-				display.updateDisplay(selected, compTurn);
-			}
-
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -367,11 +322,6 @@ public class Board {
 							
 						}
 						
-						//!! Return move automatically also jumped
-						//Edit to jump separately
-						
-						//Edit out when editing out returns
-						//! return attemptMove(coord);
 					}
 
 				}
@@ -389,7 +339,7 @@ public class Board {
 	/*
 	 * Tests if move if permissible, without considering other pieces on the board.
 	 */
-	public boolean validMove(int[] start, int[] end, boolean king) {
+	private boolean validMove(int[] start, int[] end, boolean king) {
 	
 		// Breaking points into individual vars so they're easier to work with
 		int startX = start[0];
@@ -465,100 +415,7 @@ public class Board {
 		nextTurn();
 	}
 
-	public boolean attemptJump(int[] coord) {
-			// Checks for single jump initially, with potential ability to iterate later
-	
-			int[] currentCoord = selected.getCoord();
-			int[] destCoord = coord;
-			Square destSquare = squares[coord[0]][coord[1]];
-	
-			// Check direction
-			if (allowedDirection(currentCoord, destCoord, selected.getKing())) {
-	
-				// Abs value of difference needs to be two
-				// If difference is 2, add or subtract one from x & y to get inbetween coord
-	
-				// Check if it is adjacent with one square inbetween
-				if (Math.abs(currentCoord[0] - destCoord[0]) == 2 && Math.abs(currentCoord[1] - destCoord[1]) == 2) {
-	
-					int[] btCoord = new int[2];
-	
-					// Calculate inbetween coord
-					if (currentCoord[0] > destCoord[0]) {
-						btCoord[0] = currentCoord[0] - 1;
-					} else {
-						btCoord[0] = currentCoord[0] + 1;
-					}
-					if (currentCoord[1] > destCoord[1]) {
-						btCoord[1] = currentCoord[1] - 1;
-					} else {
-						btCoord[1] = currentCoord[1] + 1;
-					}
-	
-					Square btSquare = squares[btCoord[0]][btCoord[1]];
-	
-					if (btSquare.hasToken() && btSquare.getPlayer() != turn) {
-	
-						// Inform destination it has token
-						destSquare.placeToken(turn);
-	
-						// King checks
-	
-						if (selected.getKing()) {
-							destSquare.makeKing();
-						} else {
-							attemptKing(destSquare);
-						}
-	
-						// Inform selected it is empty
-						selected.clear();
-						selected = null;
-	
-						// Inform between square that it is empty
-						btSquare.clear();
-	
-						// Update score
-	//					window.updateClaimed(turn);
-						if (turn == 1) {
-							oneTotal++;
-						} else {
-							twoTotal++;
-						}
-	
-						nextTurn();
-	
-						if (display != null) {
-							display.updateDisplay(selected, compTurn);
-						}
-	
-						return true;
-	
-					} else {
-						// !! If there's an error it might be here
-						return false;
-					}
-	
-				} else {
-					// Else, do nothing. Do I want to return something for a failed move?
-					if (window != null) {
-						window.updateMessage("Invalid move");
-					}
-	
-					return false;
-				}
-	
-			} else {
-	
-				if (window != null) {
-					window.updateMessage("Invalid move");
-				}
-	
-				return false;
-			}
-	
-		}
-
-	public boolean validJump(int[] start, int[] end, boolean king) {
+	private boolean validJump(int[] start, int[] end, boolean king) {
 		// Breaking points into individual vars so they're easier to work with
 		int startX = start[0];
 		int startY = start[1];
@@ -655,21 +512,47 @@ public class Board {
 		}
 	}
 
-	public boolean allowedSelect() {
-
-		return false;
+	// Note: Added null check for selected while re-factoring.
+	// ! Need to remove null check from attemptAction()
+	public boolean allowedSelect(int[] coord) {
+		Square chosen = squares[coord[0]][coord[1]];
+		
+		if (selected == null && chosen.hasToken() && chosen.getPlayer() == turn) {
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 
-	public void select() {
-
+	public void select(int[] coord) {
+		Square chosen = squares[coord[0]][coord[1]];
+		
+		selected = chosen;
+		
+		//Move this to attemptAction() ?
+		if (display != null) {
+			display.updateDisplay(selected, compTurn);
+		}
+		
 	}
 
-	public boolean allowedDeselect() {
+	public boolean allowedDeselect(int[] coord) {
 
-		return false;
+		if(selected != null && coord.equals(selected.getCoord())) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public void deselect() {
+		selected = null; 
+		
+		//Potentially move
+		if (window != null) {
+			display.updateDisplay(selected, compTurn);
+		}
 
 	}
 
@@ -696,6 +579,144 @@ public class Board {
 	public Square[][] getSquares() {
 		return squares;
 	}
+
+	// !Rename?
+	// Incomplete
+	public boolean attemptGridSelect(int[] coord) {
+		// System.out.println("AttemptGridSelect");
+		Square chosen = squares[coord[0]][coord[1]];
+	
+		if (chosen.hasToken()) {
+	
+			// Check if it needs to deselect(?)
+			// But that might return weirdness if the computer
+			// is relying on getting a true from this in order to try next moves?
+			// If selected == true, test deselect?
+	
+			if (chosen.getPlayer() == turn) {
+				selected = chosen;
+				if (display != null) {
+					display.updateDisplay(selected, compTurn);
+				}
+				return true;
+			} else {
+				return false;
+			}
+	
+		} else {
+			return false;
+		}
+	}
+
+	public boolean attemptDeselect(int[] coord) {
+	
+		if (coord.equals(selected.getCoord())) {
+	
+			selected = null;
+	
+			// !!Edit what this does, where logic is stored
+			if (window != null) {
+				display.updateDisplay(selected, compTurn);
+			}
+	
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+//	public boolean attemptJump(int[] coord) {
+//			// Checks for single jump initially, with potential ability to iterate later
+//	
+//			int[] currentCoord = selected.getCoord();
+//			int[] destCoord = coord;
+//			Square destSquare = squares[coord[0]][coord[1]];
+//	
+//			// Check direction
+//			if (allowedDirection(currentCoord, destCoord, selected.getKing())) {
+//	
+//				// Abs value of difference needs to be two
+//				// If difference is 2, add or subtract one from x & y to get inbetween coord
+//	
+//				// Check if it is adjacent with one square inbetween
+//				if (Math.abs(currentCoord[0] - destCoord[0]) == 2 && Math.abs(currentCoord[1] - destCoord[1]) == 2) {
+//	
+//					int[] btCoord = new int[2];
+//	
+//					// Calculate inbetween coord
+//					if (currentCoord[0] > destCoord[0]) {
+//						btCoord[0] = currentCoord[0] - 1;
+//					} else {
+//						btCoord[0] = currentCoord[0] + 1;
+//					}
+//					if (currentCoord[1] > destCoord[1]) {
+//						btCoord[1] = currentCoord[1] - 1;
+//					} else {
+//						btCoord[1] = currentCoord[1] + 1;
+//					}
+//	
+//					Square btSquare = squares[btCoord[0]][btCoord[1]];
+//	
+//					if (btSquare.hasToken() && btSquare.getPlayer() != turn) {
+//	
+//						// Inform destination it has token
+//						destSquare.placeToken(turn);
+//	
+//						// King checks
+//	
+//						if (selected.getKing()) {
+//							destSquare.makeKing();
+//						} else {
+//							attemptKing(destSquare);
+//						}
+//	
+//						// Inform selected it is empty
+//						selected.clear();
+//						selected = null;
+//	
+//						// Inform between square that it is empty
+//						btSquare.clear();
+//	
+//						// Update score
+//	//					window.updateClaimed(turn);
+//						if (turn == 1) {
+//							oneTotal++;
+//						} else {
+//							twoTotal++;
+//						}
+//	
+//						nextTurn();
+//	
+//						if (display != null) {
+//							display.updateDisplay(selected, compTurn);
+//						}
+//	
+//						return true;
+//	
+//					} else {
+//						// !! If there's an error it might be here
+//						return false;
+//					}
+//	
+//				} else {
+//					// Else, do nothing. Do I want to return something for a failed move?
+//					if (window != null) {
+//						window.updateMessage("Invalid move");
+//					}
+//	
+//					return false;
+//				}
+//	
+//			} else {
+//	
+//				if (window != null) {
+//					window.updateMessage("Invalid move");
+//				}
+//	
+//				return false;
+//			}
+//	
+//		}
 
 //	public boolean attemptMove(int[] coord) {
 //		// System.out.println("Attempt move");
