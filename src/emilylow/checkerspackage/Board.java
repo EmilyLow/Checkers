@@ -12,125 +12,115 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 //Make more specific?
-import java.lang.*; 
-
-
+import java.lang.*;
 
 public class Board {
-	
-	
+
 	private static final int SIDE_LENGTH = 100;
 	private static final int OFFSET = 50;
 	private static final int TOKEN_SHRINK = 5;
-	
-	
+
 	private Square[][] squares;
 	private StatusWindow window;
 	private boolean compOn;
-	private Square selected; 
-	//Either 1 or 2
+	private Square selected;
+	// Either 1 or 2
 	private int turn;
-	//Is this the right way to do this?
+	// Is this the right way to do this?
 	private boolean compTurn;
 	private int oneTotal;
 	private int twoTotal;
-	
-	private boolean gameOver;
-	
 
-	
+	private boolean gameOver;
 
 	private Display display;
 	private CompPlayer compPlayer;
-	
-	
-	//Possibly make the declaration of this more obvious, and not just implied by if a statusWindow is given
+
+	// Possibly make the declaration of this more obvious, and not just implied by
+	// if a statusWindow is given
 	boolean primary;
-	
+
 	Board(StatusWindow statusWindow) {
-		
+
 		primary = true;
-		
-		
-		//This is temporary, before Computer is implemented
+
+		// This is temporary, before Computer is implemented
 		compOn = false;
 		compTurn = false;
-		
-		selected = null; 
+
+		selected = null;
 		turn = 1;
 		squares = new Square[8][8];
 		oneTotal = 0;
 		twoTotal = 0;
-		
+
 		window = statusWindow;
 		window.setBoard(this);
 		gameOver = false;
-		
+
 		setUpBoard();
 
 		display = new Display(squares, selected, this);
 		compPlayer = new CompPlayer(this);
-		
+
 	}
-	
-	/* Clone constructor. Should this be done differently? Like, making and then setting after? 
-	 * Or passing in a single board and using get on all of its elements? */
+
+	/*
+	 * Clone constructor. Should this be done differently? Like, making and then
+	 * setting after? Or passing in a single board and using get on all of its
+	 * elements?
+	 */
 	Board(Square[][] squares, int turn, int oneTotal, int twoTotal) {
 		primary = false;
-		
-		//!!! Temp
+
+		// !!! Temp
 		compOn = false;
-		
-		//!!! Consider if it should be able to start a board with a pre-selected piece
+
+		// !!! Consider if it should be able to start a board with a pre-selected piece
 		selected = null;
-	
+
 		this.turn = turn;
 		this.squares = squares;
 		this.oneTotal = oneTotal;
 		this.twoTotal = twoTotal;
-		
+
 		gameOver = false;
-		
+
 		window = null;
 		display = null;
-		
-		
+
 	}
-	
+
 	public MockBoard makeMockBoard(int iter) {
-		
-	
-		
+
 		MockBoard mockBoard = new MockBoard(copySquares(squares), turn, oneTotal, twoTotal, iter);
-		
+
 		return mockBoard;
 	}
 
 	private Square[][] copySquares(Square[][] startSquares) {
-		Square [][] newSquares = new Square[8][8];
-		
-		for(int y = 0; y < startSquares.length; y++) { 
-			for(int x = 0; x < startSquares.length; x++) {
+		Square[][] newSquares = new Square[8][8];
+
+		for (int y = 0; y < startSquares.length; y++) {
+			for (int x = 0; x < startSquares.length; x++) {
 				newSquares[x][y] = startSquares[x][y].copySquare();
 			}
 		}
-		
-		
+
 		return null;
 	}
-	
-	
-	
+
 	public void setUpBoard() {
 		for (int y = 0; y < squares.length; y++) {
-			for(int x = 0; x < squares[0].length; x++) {
-				int[] gridCoord = {x, y};
+			for (int x = 0; x < squares[0].length; x++) {
+				int[] gridCoord = { x, y };
 				int[] pixelPoint = convertGridtoPixel(gridCoord);
-				
-				Rectangle2D.Double newRect = new Rectangle2D.Double(pixelPoint[0], pixelPoint[1], SIDE_LENGTH, SIDE_LENGTH);
+
+				Rectangle2D.Double newRect = new Rectangle2D.Double(pixelPoint[0], pixelPoint[1], SIDE_LENGTH,
+						SIDE_LENGTH);
 				Square tempSquare = new Square(gridCoord, newRect);
 				squares[x][y] = tempSquare;
-				
+
 			}
 		}
 
@@ -139,62 +129,61 @@ public class Board {
 	public int[] convertGridtoPixel(int[] gridCoord) {
 		int gridX = gridCoord[0];
 		int gridY = gridCoord[1];
-		
+
 		int xPoint = SIDE_LENGTH * gridX + OFFSET;
 		int yPoint = SIDE_LENGTH * gridY + OFFSET;
-		
-	
-		int[] pixelPoint = {xPoint, yPoint};
+
+		int[] pixelPoint = { xPoint, yPoint };
 		return pixelPoint;
 	}
-	
+
 	public void restart() {
 		squares = new Square[8][8];
-		turn = 1; 
+		turn = 1;
 		oneTotal = 0;
 		twoTotal = 0;
 		selected = null;
 		setUpBoard();
-		
+
 		display.newGame(squares);
 	}
-	
+
 	public void toggleCompOn() {
 		compOn = !compOn;
 		restart();
 //		System.out.println(compOn);
 	}
-	
+
 	public void nextTurn() {
 		if (!checkWin()) {
-			if(turn == 1) {
+			if (turn == 1) {
 				turn = 2;
-				if(compOn) {
+				if (compOn) {
 					compTurn = true;
-					//Alert computer to take turn
-					
+					// Alert computer to take turn
+
 					compPlayer.triggerTurn();
-					
+
 				}
 			} else {
 				turn = 1;
-				if(compOn) {
+				if (compOn) {
 					compTurn = false;
 				}
 			}
 			window.setTurn(turn, compTurn);
 		}
-		
-	}
-	
 
-	//Is it bad practice to have a function that both returns a go-ahead for another function
-	//while also changing the state of the program itself?
+	}
+
+	// Is it bad practice to have a function that both returns a go-ahead for
+	// another function
+	// while also changing the state of the program itself?
 	public boolean checkWin() {
-		if(oneTotal == 12) {
+		if (oneTotal == 12) {
 			window.showWinner(1);
 			System.out.println("Player one wins!");
-			//Redundant?
+			// Redundant?
 			gameOver = true;
 			return true;
 		} else if (twoTotal == 12) {
@@ -205,393 +194,400 @@ public class Board {
 		} else {
 			return false;
 		}
-		
+
 	}
-	
-	
-	
+
 	public boolean allowedDirection(int[] start, int[] end, boolean king) {
-	
+
 		int startY = start[1];
 		int endY = end[1];
-		
+
 		boolean direction = false;
-		//Check for moving in correct direction
-		if(king) {
+		// Check for moving in correct direction
+		if (king) {
 			direction = true;
-		} else if(turn == 1) {
-			
-			//Check that player 1 moves up the board
-			if(endY < startY) {
+		} else if (turn == 1) {
+
+			// Check that player 1 moves up the board
+			if (endY < startY) {
 				direction = true;
-			}
-			else {
-				//Unnecessary, since already false, but for clarity
+			} else {
+				// Unnecessary, since already false, but for clarity
 				direction = false;
 			}
-		} else  {//turn == 2 
-			 
-			//Check that player 2 moves down the board
+		} else {// turn == 2
+
+			// Check that player 2 moves down the board
 			if (endY > startY) {
 				direction = true;
-			}
-			else {
+			} else {
 				direction = false;
 			}
 		}
-		
+
 		return direction;
 	}
-	
+
 	public boolean outOfBounds(int[] coord) {
-		
-		if(0 <= coord[0] && coord[0] <=7 && 0 <= coord[1] && coord[1] <= 7) {
+
+		if (0 <= coord[0] && coord[0] <= 7 && 0 <= coord[1] && coord[1] <= 7) {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	
-	
-	/*
-	 * Tests if move if permissible, without considering other pieces on the board.
-	 */
-	public boolean validMove(int[] start, int[] end, boolean king) {
-		
-		//Breaking points into individual vars so they're easier to work with
-		int startX = start[0];
-		int startY = start[1];
-		
-		int endX = end[0];
-		int endY = end[1];
-		
-		if(!outOfBounds(end)) { 
-		
-		boolean direction = allowedDirection(start, end, king);
-		
-		//Check for adjacency
-		
-		boolean adjacency;
-		if(Math.abs(startX - endX) <= 1 && Math.abs(startY - endY) <= 1) {
-			adjacency = true;
-		}
-		else {
-			adjacency = false;
-		}
-		
-		
-		
-		
-		return direction && adjacency;
-		
-		} else {
-			//Move endpoint is out of bounds, return false. 
-			return false;
-		}
-	}
-	
-	
-	
 
-	
-	
-	
-	//!Rename?
-	//Incomplete
+	// !Rename?
+	// Incomplete
 	public boolean attemptGridSelect(int[] coord) {
 		// System.out.println("AttemptGridSelect");
 		Square chosen = squares[coord[0]][coord[1]];
-		
-		if(chosen.hasToken()) {
-			
-			//Check if it needs to deselect(?)
-			//But that might return weirdness if the computer 
-			//is relying on getting a true from this in order to try next moves?
-			// If selected == true, test deselect? 
-			
-			
-			if(chosen.getPlayer() == turn) {
+
+		if (chosen.hasToken()) {
+
+			// Check if it needs to deselect(?)
+			// But that might return weirdness if the computer
+			// is relying on getting a true from this in order to try next moves?
+			// If selected == true, test deselect?
+
+			if (chosen.getPlayer() == turn) {
 				selected = chosen;
-				if(display != null) {
+				if (display != null) {
 					display.updateDisplay(selected, compTurn);
 				}
 				return true;
 			} else {
 				return false;
 			}
-			
+
 		} else {
 			return false;
 		}
 	}
-	
+
 	public boolean attemptDeselect(int[] coord) {
-		
-		if(coord.equals(selected.getCoord())) {
-			
+
+		if (coord.equals(selected.getCoord())) {
+
 			selected = null;
 
-			//!!Edit what this does, where logic is stored
-			if(window != null) {
+			// !!Edit what this does, where logic is stored
+			if (window != null) {
 				display.updateDisplay(selected, compTurn);
 			}
-			
+
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	
-	
-	public boolean attemptMove(int[] coord) {
-		// System.out.println("Attempt move");
-		
-			//Check that DESTINATION is an active square and empty
-			//Do this earlier on? 
-		
-			Square destSquare = squares[coord[0]][coord[1]];
-			
-			if(destSquare.getActive() && destSquare.hasToken() == false) {
-				
-				if(validMove(selected.getCoord(), destSquare.getCoord(), selected.getKing())) {
-					
-					int currentPlayer = selected.getPlayer();
-					
-				
-					
-					
-				
-					
-					//Inform destination it has token
-					destSquare.placeToken(currentPlayer);
-					
-					//King checks
-					
-					if(selected.getKing()) {
-						destSquare.makeKing();
-					} else {
-						attemptKing(destSquare);
-					}
-					
-					//Inform selected it is empty
-					selected.clear();
-					
-					
-					//Change selected to null
-					selected = null;
-					
-					
-					//Go to next turn
-//					nextTurn();
-					
-					//!! Change to return true and have calling function call move
-					//!! Or something
-					if (display != null) {
-						display.updateDisplay(selected, compTurn);
-					}
-					
-					nextTurn();
-					return true;
-					
-				} else {
-					return attemptJump(coord);
-				}
-				
-		
-			} else {
-				
-				if(window != null) {
-					window.updateMessage("Invalid move");
-				}
-				
-				return false;
-			}
-			
-	
-	}
-	
 	public boolean attemptJump(int[] coord) {
-		//Checks for single jump initially, with potential ability to iterate later
-		
-		
-		
+		// Checks for single jump initially, with potential ability to iterate later
+
 		int[] currentCoord = selected.getCoord();
 		int[] destCoord = coord;
 		Square destSquare = squares[coord[0]][coord[1]];
-		
-		//Check direction
-		if(allowedDirection(currentCoord, destCoord, selected.getKing()) ) {
-			
-			//Abs value of difference needs to be two
-			//If difference is 2, add or subtract one from x & y to get inbetween coord
-			
-			//Check if it is adjacent with one square inbetween
-			if(Math.abs(currentCoord[0] - destCoord[0]) == 2 && Math.abs(currentCoord[1] - destCoord[1]) == 2 ) {
-				
+
+		// Check direction
+		if (allowedDirection(currentCoord, destCoord, selected.getKing())) {
+
+			// Abs value of difference needs to be two
+			// If difference is 2, add or subtract one from x & y to get inbetween coord
+
+			// Check if it is adjacent with one square inbetween
+			if (Math.abs(currentCoord[0] - destCoord[0]) == 2 && Math.abs(currentCoord[1] - destCoord[1]) == 2) {
+
 				int[] btCoord = new int[2];
-						
-				//Calculate inbetween coord
-				if(currentCoord[0] > destCoord[0]) {
-					btCoord[0] = currentCoord[0] -1;
+
+				// Calculate inbetween coord
+				if (currentCoord[0] > destCoord[0]) {
+					btCoord[0] = currentCoord[0] - 1;
 				} else {
 					btCoord[0] = currentCoord[0] + 1;
 				}
-				if(currentCoord[1] > destCoord[1]) {
-					btCoord[1] = currentCoord[1] -1;
+				if (currentCoord[1] > destCoord[1]) {
+					btCoord[1] = currentCoord[1] - 1;
 				} else {
 					btCoord[1] = currentCoord[1] + 1;
 				}
-				
+
 				Square btSquare = squares[btCoord[0]][btCoord[1]];
-				
-				if(btSquare.hasToken() && btSquare.getPlayer() != turn) {
-					
-					//Inform destination it has token
+
+				if (btSquare.hasToken() && btSquare.getPlayer() != turn) {
+
+					// Inform destination it has token
 					destSquare.placeToken(turn);
-					
-					//King checks
-					
-					if(selected.getKing()) {
+
+					// King checks
+
+					if (selected.getKing()) {
 						destSquare.makeKing();
 					} else {
 						attemptKing(destSquare);
 					}
-					
-					//Inform selected it is empty
-					 selected.clear();
-					 selected = null;
-					 
-					//Inform between square that it is empty
+
+					// Inform selected it is empty
+					selected.clear();
+					selected = null;
+
+					// Inform between square that it is empty
 					btSquare.clear();
-					
-					//Update score
+
+					// Update score
 //					window.updateClaimed(turn);
-					if(turn == 1) {
+					if (turn == 1) {
 						oneTotal++;
 					} else {
 						twoTotal++;
 					}
-					
+
 					nextTurn();
-					
-					
-					if(display!= null) {
+
+					if (display != null) {
 						display.updateDisplay(selected, compTurn);
 					}
 
 					return true;
-					
+
 				} else {
-					//!! If there's an error it might be here
+					// !! If there's an error it might be here
 					return false;
 				}
-				
-				
+
 			} else {
-				//Else, do nothing. Do I want to return something for a failed move?
+				// Else, do nothing. Do I want to return something for a failed move?
 				if (window != null) {
 					window.updateMessage("Invalid move");
 				}
-				
+
 				return false;
 			}
 
-			
 		} else {
-			
+
 			if (window != null) {
 				window.updateMessage("Invalid move");
 			}
-			
+
 			return false;
 		}
-		
-		
-		
+
 	}
-	
+
 	public boolean attemptDoubleJump() {
-		//To attempt after jumping returns true
+		// To attempt after jumping returns true
 		return false;
 	}
-	
+
 	public void attemptKing(Square potQ) {
 		int[] coord = potQ.getCoord();
-		
-		if(coord[1] == 0 && potQ.getPlayer() == 1) {
+
+		if (coord[1] == 0 && potQ.getPlayer() == 1) {
 			potQ.makeKing();
 		} else if (coord[1] == (squares.length - 1) && potQ.getPlayer() == 2) {
 			potQ.makeKing();
-		} //else, not a king so do nothing
+		} // else, not a king so do nothing
 	}
-	
-	
 
-	
-	
-	public boolean attemptAction(int[] coord) {
-		
-		//May need to change how gameover works. 
-		if(gameOver) {
-			
+	/*
+	 * Called when human player makes an action, to determine what type of action
+	 * was made.
+	 */
+	// ! Note, some functionality may need to be moved to be accessible to
+	// compPlayer
+	//!! Note, may be able to edit out check for window existing, but possibly no harm to leaving in?
+	public void attemptAction(int[] coord) {
+
+		// May need to change how gameover works.
+		if (gameOver) {
+
 			if (window != null) {
 				window.updateMessage("Game over. Start new game.");
 			}
-			
-			return false;
+
+			// ! return false;
 		} else {
-			
-			if(window != null) {
+
+			if (window != null) {
 				window.clearMessage();
 			}
-			//!! Null check currently exists for StatusWindow. May remove
-			if(coord != null) {
-				
-				if(selected == null) {
-				
-					return attemptGridSelect(coord);
-					
+			// !! Null check currently exists for StatusWindow. May remove
+			if (coord != null) {
+
+				if (selected == null) {
+
+					// ! return attemptGridSelect(coord);
+
 				} else {
-					
-					//? Bad form to change status in first part of if statement?
+
+					// ? Bad form to change status in first part of if statement?
 					if (attemptDeselect(coord)) {
-						return true;
+						
 					} else {
-						return attemptMove(coord);
+						
+						if(allowedMove(coord)) {
+							move(coord);
+						} else {
+							if (window != null) {
+								window.updateMessage("Invalid move");
+							}
+						}
+						
+						//!! Return move automatically also jumped
+						//Edit to jump separately
+						
+						//Edit out when editing out returns
+						//! return attemptMove(coord);
 					}
-					
+
 				}
-				
-				
+
 			} else {
-				if(window != null) {
+				if (window != null) {
 					window.updateMessage("Invalid destination");
 				}
-				return false;
+				//! return false;
 			}
 		}
-		
-		
+
 	}
+
+	/*
+	 * Tests if move if permissible, without considering other pieces on the board.
+	 */
+	public boolean validMove(int[] start, int[] end, boolean king) {
+	
+		// Breaking points into individual vars so they're easier to work with
+		int startX = start[0];
+		int startY = start[1];
+	
+		int endX = end[0];
+		int endY = end[1];
+	
+		if (!outOfBounds(end)) {
+	
+			boolean direction = allowedDirection(start, end, king);
+	
+			// Check for adjacency
+	
+			boolean adjacency;
+			if (Math.abs(startX - endX) <= 1 && Math.abs(startY - endY) <= 1) {
+				adjacency = true;
+			} else {
+				adjacency = false;
+			}
+	
+			return direction && adjacency;
+	
+		} else {
+			// Move endpoint is out of bounds, return false.
+			return false;
+		}
+	}
+
+
+	public boolean allowedMove(int[] endCoord) {
+
+		Square destSquare = squares[endCoord[0]][endCoord[1]];
+		
+		
+		//Separated to make if more readable
+		boolean validMove = validMove(selected.getCoord(), endCoord, selected.getKing());
+		
+		if (destSquare.getActive() && !destSquare.hasToken() && validMove) {
+	
+				return true;
 	
 	
+		} else {
+	
+			return false;
+		}
+	}
+
+	public void move(int[] endCoord) {
+		
+		Square destSquare = squares[endCoord[0]][endCoord[1]];
+		
+		int tokenOwner = selected.getPlayer();
+		
+		// Inform destination it has token
+		destSquare.placeToken(tokenOwner);
+
+		// King checks
+
+		if (selected.getKing()) {
+			destSquare.makeKing();
+		} else {
+			attemptKing(destSquare);
+		}
+		
+		// Inform selected it is empty
+		selected.clear();
+
+		// Change selected to null
+		selected = null;
+		
+		// !! Later, see if this can be moved to attemptAction(). But check it works without moving first
+		if (display != null) {
+			display.updateDisplay(selected, compTurn);
+		}
+		
+		//!! I may remove this from move() and jump() and make it seperate later, to help with iteration.
+		nextTurn();
+
+
+	}
+
+	public boolean validJump() {
+
+		return false;
+	}
+
+	public boolean allowedJump() {
+
+		return false;
+	}
+
+	public void jump() {
+
+	}
+
+	public boolean allowedSelect() {
+
+		return false;
+	}
+
+	public void select() {
+
+	}
+
+	public boolean allowedDeselect() {
+
+		return false;
+	}
+
+	public void deselect() {
+
+	}
+
 	public Display getDisplay() {
 		return display;
 	}
-	
+
 	public int getTurn() {
 		return turn;
 	}
-	
+
 	public int getPlayerOneTotal() {
 		return oneTotal;
 	}
-	
+
 	public int getPlayerTwoTotal() {
 		return twoTotal;
 	}
-	
+
 	public boolean getCompOn() {
 		return compOn;
 	}
@@ -599,5 +595,60 @@ public class Board {
 	public Square[][] getSquares() {
 		return squares;
 	}
+
+//	public boolean attemptMove(int[] coord) {
+//		// System.out.println("Attempt move");
+//	
+//		// Check that DESTINATION is an active square and empty
+//		// Do this earlier on?
+//	
+//		Square destSquare = squares[coord[0]][coord[1]];
+//	
+//		if (destSquare.getActive() && destSquare.hasToken() == false) {
+//	
+//			if (validMove(selected.getCoord(), destSquare.getCoord(), selected.getKing())) {
+//	
+//				int currentPlayer = selected.getPlayer();
+//	
+//				// Inform destination it has token
+//				destSquare.placeToken(currentPlayer);
+//	
+//				// King checks
+//	
+//				if (selected.getKing()) {
+//					destSquare.makeKing();
+//				} else {
+//					attemptKing(destSquare);
+//				}
+//	
+//				// Inform selected it is empty
+//				selected.clear();
+//	
+//				// Change selected to null
+//				selected = null;
+//	
+//				// !! Change to return true and have calling function call move
+//				// !! Or something
+//				if (display != null) {
+//					display.updateDisplay(selected, compTurn);
+//				}
+//	
+//				nextTurn();
+//				return true;
+//	
+//			} else {
+//				return attemptJump(coord);
+//			}
+//	
+//		} else {
+//	
+//			if (window != null) {
+//				window.updateMessage("Invalid move");
+//			}
+//	
+//			return false;
+//		}
+//	
+//	}
 
 }
