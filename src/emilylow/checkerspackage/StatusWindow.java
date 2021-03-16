@@ -237,7 +237,7 @@ public class StatusWindow extends JPanel{
 		}
 		
 		public void actionPerformed(ActionEvent event) {
-			System.out.println("Newgame click");
+			// System.out.println("Newgame click");
 			newGame();
 		}
 		
@@ -251,7 +251,7 @@ private class PlayerAction implements ActionListener {
 		
 		public void actionPerformed(ActionEvent event) {
 //			System.out.println("Player Click");
-//			System.out.println(event.toString());
+//			// System.out.println(event.toString());
 			compPlayerToggled();
 			
 		}

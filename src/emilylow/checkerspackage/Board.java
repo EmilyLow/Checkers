@@ -173,7 +173,7 @@ public class Board {
 					compTurn = true;
 					//Alert computer to take turn
 					
-					compPlayer.testTriggerTurn();
+					compPlayer.triggerTurn();
 					
 				}
 			} else {
@@ -243,8 +243,19 @@ public class Board {
 		return direction;
 	}
 	
+	public boolean outOfBounds(int[] coord) {
+		
+		if(0 <= coord[0] && coord[0] <=7 && 0 <= coord[1] && coord[1] <= 7) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 	
 	
+	/*
+	 * Tests if move if permissible, without considering other pieces on the board.
+	 */
 	public boolean validMove(int[] start, int[] end, boolean king) {
 		
 		//Breaking points into individual vars so they're easier to work with
@@ -253,6 +264,8 @@ public class Board {
 		
 		int endX = end[0];
 		int endY = end[1];
+		
+		if(!outOfBounds(end)) { 
 		
 		boolean direction = allowedDirection(start, end, king);
 		
@@ -268,7 +281,13 @@ public class Board {
 		
 		
 		
+		
 		return direction && adjacency;
+		
+		} else {
+			//Move endpoint is out of bounds, return false. 
+			return false;
+		}
 	}
 	
 	
@@ -280,7 +299,7 @@ public class Board {
 	//!Rename?
 	//Incomplete
 	public boolean attemptGridSelect(int[] coord) {
-		System.out.println("AttemptGridSelect");
+		// System.out.println("AttemptGridSelect");
 		Square chosen = squares[coord[0]][coord[1]];
 		
 		if(chosen.hasToken()) {
@@ -326,7 +345,7 @@ public class Board {
 	
 	
 	public boolean attemptMove(int[] coord) {
-		System.out.println("Attempt move");
+		// System.out.println("Attempt move");
 		
 			//Check that DESTINATION is an active square and empty
 			//Do this earlier on? 
@@ -577,5 +596,8 @@ public class Board {
 		return compOn;
 	}
 
+	public Square[][] getSquares() {
+		return squares;
+	}
 
 }

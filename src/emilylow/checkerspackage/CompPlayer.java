@@ -17,22 +17,17 @@ public class CompPlayer {
 		
 		realBoard = sourceBoard;
 		iterations = 1;
-		timer = new Timer(1000, new WaitAction());
+		timer = new Timer(500, new WaitAction());
 		timer.setRepeats(false);
 	}
 	
-	public void testTriggerTurn() {
+	public void triggerTurn() {
 		
-//		int[][] move = {{1,2}, {2,3}};
-//		
-//		realBoard.attemptAction(move[0]);
-//		//Insert delay
-//		
-//		realBoard.attemptAction(move[1]);
+
 		timer.start();
 	}
 	
-	public void afterTimer() {
+	public void testBeginTurn() {
 		int[][] move = {{1,2}, {2,3}};
 		
 		realBoard.attemptAction(move[0]);
@@ -42,14 +37,14 @@ public class CompPlayer {
 	}
 	
 	
-	public void triggerTurn() {
+	public void beginTurn() {
 		
 		MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
 		
 		int[][] bestMove = baseMockBoard.findBestMove();
 		
 		realBoard.attemptAction(bestMove[0]);
-		//Insert delay
+		
 		realBoard.attemptAction(bestMove[1]);
 	}
 
@@ -57,7 +52,7 @@ public class CompPlayer {
 		@Override
 	    public void actionPerformed(ActionEvent e)
 	    {
-	        afterTimer();
+	        testBeginTurn();
 	    }
 		
 	}

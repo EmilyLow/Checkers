@@ -49,12 +49,12 @@ public class Display extends javax.swing.JComponent {
 	
 	
 	public void updateDisplay(Square chosen, Boolean compTurn) {
-		System.out.println("Update display");
+		// System.out.println("Update display");
 		selected = chosen;
 		this.compTurn = compTurn;
 		repaint();
 		
-		System.out.println("Post update repaint");
+		// System.out.println("Post update repaint");
 	}
 	
 	public void newGame(Square[][] squares) {
@@ -64,7 +64,7 @@ public class Display extends javax.swing.JComponent {
 	}
 
 	public void paintComponent(Graphics g) {
-		System.out.println("Paint triggered " + count);
+		// System.out.println("Paint triggered " + count);
 		count++;
 		var g2 = (Graphics2D) g;
 	
