@@ -447,8 +447,8 @@ public class Board {
 		// Checks for single jump initially, with potential ability to iterate later
 		
 			
-			System.out.println("Jump Check: ");
-			System.out.println(Arrays.toString(endCoord));
+//			System.out.println("Jump Check: ");
+//			System.out.println(Arrays.toString(endCoord));
 //			System.out.println(endCoord.toString());
 
 		
@@ -462,8 +462,9 @@ public class Board {
 				int[] btCoord = findBtCoord(startCoord, endCoord);
 
 				Square btSquare = squares[btCoord[0]][btCoord[1]];
+				Square endSquare = squares[endCoord[0]][endCoord[1]];
 
-				if (btSquare.hasToken() && btSquare.getPlayer() != selected.getPlayer()) {
+				if (btSquare.hasToken() && btSquare.getPlayer() != selected.getPlayer() && !endSquare.hasToken()) {
 
 					return true;
 

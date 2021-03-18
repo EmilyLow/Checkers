@@ -32,13 +32,13 @@ public class MockBoard extends Board {
 		
 		Square[][] squares = super.getSquares();
 		int[][] bestMove = new int[2][2];
-		int bestScore = -1; //Star int negative to account for the possibility of no good moves
+		int bestScore = -1000; //Star int negative to account for the possibility of no good moves
 		
-		//TEMP
-		boolean desFound = false;
+		
 		
 		for (int y = 0; y < squares.length; y++) {
 			for(int x = 0; x < squares[0].length; x++) {
+				
 				Square currentSquare = squares[x][y];
 				
 				if(allowedSelect(currentSquare.getCoord())) {
@@ -50,30 +50,37 @@ public class MockBoard extends Board {
 					select(sqCoord);
 					
 					
-					//Check each potential jump
+					//Check each potential jump for current piece
 					int[][] potentialJumps = getJumpCoords(sqCoord);
 					for(int i = 0; i < potentialJumps.length; i++) {
 						if(allowedJump(potentialJumps[i])) {
-							//!! Temp, make the jump
-							bestMove[0] = sqCoord.clone();
-							bestMove[1] = potentialJumps[i].clone();
-							desFound = true;
-							break;
-						} else {
-							System.out.println("Jump not allowed");
+							int currentScore = 5; 
 							
-						}
+							if(currentScore > bestScore) {
+								bestScore = currentScore;
+								bestMove[0] = sqCoord.clone();
+								bestMove[1] = potentialJumps[i].clone();
+							}
+							
+						} 
 					}
 					
-					//Check each potential move
+					//Check each potential move for current piece
 					int[][] potentialMoves = getMoveCoords(sqCoord);
 					for(int i = 0; i < potentialMoves.length; i++) {
 						if(allowedMove(potentialMoves[i])) {
 							//!! Temp, make the move
-							bestMove[0] = sqCoord.clone();
-							bestMove[1] = potentialMoves[i].clone();
-							desFound = true;
-							break;
+							int currentScore = 0; 
+							if(!currentSquare.getKing()) {
+								currentScore++; 
+							}
+							if(currentScore > bestScore) {
+								bestScore = currentScore;
+								bestMove[0] = sqCoord.clone();
+								bestMove[1] = potentialMoves[i].clone();
+							}
+							
+							
 						}
 					}
 				
@@ -83,21 +90,15 @@ public class MockBoard extends Board {
 					
 				}
 				
-				//Temp!!
-				if(desFound) {
-					break;
-				}
 				//Right place?
 				deselect();
 			}
-			//Temp!!
-			if(desFound) {
-				break;
-			}
+			
 		}
 		
-		System.out.println("Possible move found");
-		System.out.println(Arrays.deepToString(bestMove));
+		System.out.println("Best score: " + bestScore);
+//		System.out.println("Possible move found");
+//		System.out.println(Arrays.deepToString(bestMove));
 		
 		return bestMove;
 	}
@@ -119,7 +120,7 @@ public class MockBoard extends Board {
 		int[][] moveCoords = {{x-1, y-1}, {x+1, y-1}, {x-1, y+1}, {x+1, y+1}};
 		
 		//Check
-		System.out.println(Arrays.deepToString(moveCoords));
+//		System.out.println(Arrays.deepToString(moveCoords));
 		
 		
 		return moveCoords;
