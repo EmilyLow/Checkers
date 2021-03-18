@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
 
 //Make more specific?
 import java.lang.*;
+import java.util.Arrays;
 
 public class Board {
 
@@ -107,7 +108,7 @@ public class Board {
 			}
 		}
 
-		return null;
+		return newSquares;
 	}
 
 	private void setUpBoard() {
@@ -367,18 +368,28 @@ public class Board {
 
 	public boolean allowedMove(int[] endCoord) {
 
-		Square destSquare = squares[endCoord[0]][endCoord[1]];
-		
 		boolean validMove = validMove(selected.getCoord(), endCoord, selected.getKing());
 		
-		if (destSquare.getActive() && !destSquare.hasToken() && validMove) {
-	
+		if(validMove) {
+			
+			Square destSquare = squares[endCoord[0]][endCoord[1]];
+			if (destSquare.getActive() && !destSquare.hasToken()) {
+				
 				return true;
 	
-		} else {
+			} 	else {
 	
 			return false;
+			}
+			
+		} else {
+			return false;
 		}
+		
+		
+		
+		
+		
 	}
 
 	public void move(int[] endCoord) {
@@ -435,12 +446,18 @@ public class Board {
 	public boolean allowedJump(int[] endCoord) {
 		// Checks for single jump initially, with potential ability to iterate later
 		
+			
+			System.out.println("Jump Check: ");
+			System.out.println(Arrays.toString(endCoord));
+//			System.out.println(endCoord.toString());
+
+		
 		int[] startCoord = selected.getCoord();
 		
 
 	
 			if (validJump(startCoord, endCoord, selected.getKing())) {
-
+				
 				//Find coordinates of the square being jumped over
 				int[] btCoord = findBtCoord(startCoord, endCoord);
 

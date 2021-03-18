@@ -43,20 +43,25 @@ public class CompPlayer {
 	 */
 	public void beginTurn() {
 		
-		MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
+		//Might want to change how checkWin works
 		
-		int[][] bestMove = baseMockBoard.findBestMove();
+		if(!realBoard.checkWin()) {
+			MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
+			int[][] bestMove = baseMockBoard.findBestMove();
+			
+			realBoard.attemptAction(bestMove[0]);
+			
+			realBoard.attemptAction(bestMove[1]);
+		}
 		
-		realBoard.attemptAction(bestMove[0]);
 		
-		realBoard.attemptAction(bestMove[1]);
 	}
 
 	private class WaitAction implements ActionListener {
 		@Override
 	    public void actionPerformed(ActionEvent e)
 	    {
-	        testBeginTurn();
+	        beginTurn();
 	    }
 		
 	}

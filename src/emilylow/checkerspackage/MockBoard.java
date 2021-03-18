@@ -22,7 +22,7 @@ public class MockBoard extends Board {
 	public MockBoard(Square[][] squares, int turn, int oneTotal, int twoTotal, int count) {
 		super(squares, turn, oneTotal, twoTotal);
 		// TODO Auto-generated constructor stub
-		
+	
 	}
 	
 	
@@ -42,34 +42,39 @@ public class MockBoard extends Board {
 				Square currentSquare = squares[x][y];
 				
 				if(allowedSelect(currentSquare.getCoord())) {
-					
+					//Temp
 					//To start with, if move is possible, return move. No recursion yet
-					//Temporarily use break for this?
 					
 					
 					int[] sqCoord = currentSquare.getCoord();
+					select(sqCoord);
+					
+					
 					//Check each potential jump
 					int[][] potentialJumps = getJumpCoords(sqCoord);
 					for(int i = 0; i < potentialJumps.length; i++) {
-//						if(allowedJump(potentialJumps[i])) {
-//							//!! Temp, make the jump
-//							bestMove[0] = sqCoord.clone();
-//							bestMove[1] = potentialJumps[i].clone();
-//							desFound = true;
-//							break;
-//						}
+						if(allowedJump(potentialJumps[i])) {
+							//!! Temp, make the jump
+							bestMove[0] = sqCoord.clone();
+							bestMove[1] = potentialJumps[i].clone();
+							desFound = true;
+							break;
+						} else {
+							System.out.println("Jump not allowed");
+							
+						}
 					}
 					
 					//Check each potential move
 					int[][] potentialMoves = getMoveCoords(sqCoord);
 					for(int i = 0; i < potentialMoves.length; i++) {
-//						if(allowedMove(potentialMoves[i])) {
-//							//!! Temp, make the jump
-//							bestMove[0] = sqCoord.clone();
-//							bestMove[1] = potentialJumps[i].clone();
-//							desFound = true;
-//							break;
-//						}
+						if(allowedMove(potentialMoves[i])) {
+							//!! Temp, make the move
+							bestMove[0] = sqCoord.clone();
+							bestMove[1] = potentialMoves[i].clone();
+							desFound = true;
+							break;
+						}
 					}
 				
 					
@@ -82,7 +87,8 @@ public class MockBoard extends Board {
 				if(desFound) {
 					break;
 				}
-				
+				//Right place?
+				deselect();
 			}
 			//Temp!!
 			if(desFound) {
