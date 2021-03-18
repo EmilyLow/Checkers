@@ -295,45 +295,34 @@ public class Board {
 			// !! Null check currently exists for StatusWindow. May remove
 			if (coord != null) {
 
-				if (selected == null) {
-
-					// ! return attemptGridSelect(coord);
-
-				} else {
-
-					// ? Bad form to change status in first part of if statement?
-					if (attemptDeselect(coord)) {
-						
+				
+				if (allowedSelect(coord)) {
+					select(coord);
+				} else if(allowedDeselect(coord)) {
+					deselect();
+				} else if (selected != null) {
+					
+					if (allowedMove(coord)) {
+						move(coord);
+					} else if (allowedJump(coord)) {
+						jump(coord);
 					} else {
-						
-						if(allowedMove(coord)) {
-							move(coord);
-						} else {
-							//Add jump if here
-							if(allowedJump(coord) ) {
-								
-								jump(coord);
-								
-							} else {
-								if (window != null) {
-									window.updateMessage("Invalid move");
-								}
-							}
-							
+						if (window != null) {
+							window.updateMessage("Invalid move");
 						}
-						
 					}
-
+					
+				} else {
+					if (window != null) {
+						window.updateMessage("Invalid selection");
+					}		
+					
 				}
-
-			} else {
-				if (window != null) {
-					window.updateMessage("Invalid destination");
-				}
-				//! return false;
 			}
 		}
-
+		
+		//Note: Could probably refactor to put nextMove() and updateDisplay() in attemptAction() if needed.
+					
 	}
 
 	/*
@@ -487,15 +476,17 @@ public class Board {
 			attemptKing(destSquare);
 		}
 
-		// Inform selected it is empty
-		selected.clear();
-		selected = null;
 		
 		int[] btCoord = findBtCoord(selected.getCoord(), endCoord);
 		Square btSquare = squares[btCoord[0]][btCoord[1]];
 		
 		// Inform between square that it is empty
 		btSquare.clear();
+		
+		// Inform selected it is empty
+			selected.clear();
+			selected = null;
+				
 
 		// Update score
 		if (turn == 1) {
@@ -524,6 +515,8 @@ public class Board {
 		}
 		
 	}
+	
+
 
 	public void select(int[] coord) {
 		Square chosen = squares[coord[0]][coord[1]];
@@ -582,48 +575,48 @@ public class Board {
 
 	// !Rename?
 	// Incomplete
-	public boolean attemptGridSelect(int[] coord) {
-		// System.out.println("AttemptGridSelect");
-		Square chosen = squares[coord[0]][coord[1]];
-	
-		if (chosen.hasToken()) {
-	
-			// Check if it needs to deselect(?)
-			// But that might return weirdness if the computer
-			// is relying on getting a true from this in order to try next moves?
-			// If selected == true, test deselect?
-	
-			if (chosen.getPlayer() == turn) {
-				selected = chosen;
-				if (display != null) {
-					display.updateDisplay(selected, compTurn);
-				}
-				return true;
-			} else {
-				return false;
-			}
-	
-		} else {
-			return false;
-		}
-	}
-
-	public boolean attemptDeselect(int[] coord) {
-	
-		if (coord.equals(selected.getCoord())) {
-	
-			selected = null;
-	
-			// !!Edit what this does, where logic is stored
-			if (window != null) {
-				display.updateDisplay(selected, compTurn);
-			}
-	
-			return true;
-		} else {
-			return false;
-		}
-	}
+//	public boolean attemptGridSelect(int[] coord) {
+//		// System.out.println("AttemptGridSelect");
+//		Square chosen = squares[coord[0]][coord[1]];
+//	
+//		if (chosen.hasToken()) {
+//	
+//			// Check if it needs to deselect(?)
+//			// But that might return weirdness if the computer
+//			// is relying on getting a true from this in order to try next moves?
+//			// If selected == true, test deselect?
+//	
+//			if (chosen.getPlayer() == turn) {
+//				selected = chosen;
+//				if (display != null) {
+//					display.updateDisplay(selected, compTurn);
+//				}
+//				return true;
+//			} else {
+//				return false;
+//			}
+//	
+//		} else {
+//			return false;
+//		}
+//	}
+//
+//	public boolean attemptDeselect(int[] coord) {
+//	
+//		if (coord.equals(selected.getCoord())) {
+//	
+//			selected = null;
+//	
+//			// !!Edit what this does, where logic is stored
+//			if (window != null) {
+//				display.updateDisplay(selected, compTurn);
+//			}
+//	
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
 
 //	public boolean attemptJump(int[] coord) {
 //			// Checks for single jump initially, with potential ability to iterate later

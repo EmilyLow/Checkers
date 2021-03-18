@@ -41,7 +41,7 @@ public class MockBoard extends Board {
 			for(int x = 0; x < squares[0].length; x++) {
 				Square currentSquare = squares[x][y];
 				
-				if(allowedSelect(currentSquare)) {
+				if(allowedSelect(currentSquare.getCoord())) {
 					
 					//To start with, if move is possible, return move. No recursion yet
 					//Temporarily use break for this?
@@ -98,26 +98,13 @@ public class MockBoard extends Board {
 	
 	
 	
-	/*
-	 * Finds tokens that can potentially be selected to make a move
-	 */
-	//!! Should this be a parent method?
-	public boolean allowedSelect(Square sq) {
-		
-		if(sq.getActive() && sq.hasToken() && sq.getPlayer() == super.getTurn() ) {
-			return true;
-		} else {
-			return false;
-		
-		}
-		
-	}
+	
 	
 	/*
 	 * Returns the four potential move destinations for a coord.
 	 * Destinations may be out of bounds. This is checked in validMove()
 	 */
-	public int[][] getMoveCoords(int[] startCoord) {
+	private int[][] getMoveCoords(int[] startCoord) {
 		
 		int x = startCoord[0];
 		int y = startCoord[1];
@@ -137,7 +124,7 @@ public class MockBoard extends Board {
 	 * They may be out of bounds. This is checked in validJump();
 	 *  !! Not implemented
 	 */
-	public int[][] getJumpCoords(int[] startCoord) {
+	private int[][] getJumpCoords(int[] startCoord) {
 		
 		
 		
