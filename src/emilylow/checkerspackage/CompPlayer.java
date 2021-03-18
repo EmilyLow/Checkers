@@ -34,6 +34,7 @@ public class CompPlayer {
 		//Insert delay
 		
 		realBoard.attemptAction(move[1]);
+		realBoard.nextTurn();
 	}
 	
 	

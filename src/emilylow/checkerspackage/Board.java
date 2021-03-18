@@ -173,7 +173,8 @@ public class Board {
 			}
 			window.setTurn(turn, compTurn);
 		}
-
+		
+		
 	}
 
 	// Is it bad practice to have a function that both returns a go-ahead for
@@ -304,8 +305,11 @@ public class Board {
 					
 					if (allowedMove(coord)) {
 						move(coord);
+						nextTurn();
 					} else if (allowedJump(coord)) {
 						jump(coord);
+						nextTurn();
+						
 					} else {
 						if (window != null) {
 							window.updateMessage("Invalid move");
@@ -318,6 +322,9 @@ public class Board {
 					}		
 					
 				}
+			}
+			if (display != null) {
+				display.updateDisplay(selected, compTurn);
 			}
 		}
 		
@@ -396,12 +403,9 @@ public class Board {
 		selected = null;
 		
 		// !! Later, see if this can be moved to attemptAction(). But check it works without moving first
-		if (display != null) {
-			display.updateDisplay(selected, compTurn);
-		}
-		
+	
 		//!! I may remove this from move() and jump() and make it seperate later, to help with iteration.
-		nextTurn();
+//		nextTurn();
 	}
 
 	private boolean validJump(int[] start, int[] end, boolean king) {
@@ -495,12 +499,9 @@ public class Board {
 			twoTotal++;
 		}
 
-		nextTurn();
+//		nextTurn();
 		
-		//!The placement of this is inconsistent, check after refactoring
-		if (display != null) {
-			display.updateDisplay(selected, compTurn);
-		}
+	
 	}
 
 	// Note: Added null check for selected while re-factoring.
@@ -523,10 +524,7 @@ public class Board {
 		
 		selected = chosen;
 		
-		//Move this to attemptAction() ?
-		if (display != null) {
-			display.updateDisplay(selected, compTurn);
-		}
+
 		
 	}
 
@@ -542,10 +540,7 @@ public class Board {
 	public void deselect() {
 		selected = null; 
 		
-		//Potentially move
-		if (window != null) {
-			display.updateDisplay(selected, compTurn);
-		}
+
 
 	}
 
@@ -572,198 +567,5 @@ public class Board {
 	public Square[][] getSquares() {
 		return squares;
 	}
-
-	// !Rename?
-	// Incomplete
-//	public boolean attemptGridSelect(int[] coord) {
-//		// System.out.println("AttemptGridSelect");
-//		Square chosen = squares[coord[0]][coord[1]];
-//	
-//		if (chosen.hasToken()) {
-//	
-//			// Check if it needs to deselect(?)
-//			// But that might return weirdness if the computer
-//			// is relying on getting a true from this in order to try next moves?
-//			// If selected == true, test deselect?
-//	
-//			if (chosen.getPlayer() == turn) {
-//				selected = chosen;
-//				if (display != null) {
-//					display.updateDisplay(selected, compTurn);
-//				}
-//				return true;
-//			} else {
-//				return false;
-//			}
-//	
-//		} else {
-//			return false;
-//		}
-//	}
-//
-//	public boolean attemptDeselect(int[] coord) {
-//	
-//		if (coord.equals(selected.getCoord())) {
-//	
-//			selected = null;
-//	
-//			// !!Edit what this does, where logic is stored
-//			if (window != null) {
-//				display.updateDisplay(selected, compTurn);
-//			}
-//	
-//			return true;
-//		} else {
-//			return false;
-//		}
-//	}
-
-//	public boolean attemptJump(int[] coord) {
-//			// Checks for single jump initially, with potential ability to iterate later
-//	
-//			int[] currentCoord = selected.getCoord();
-//			int[] destCoord = coord;
-//			Square destSquare = squares[coord[0]][coord[1]];
-//	
-//			// Check direction
-//			if (allowedDirection(currentCoord, destCoord, selected.getKing())) {
-//	
-//				// Abs value of difference needs to be two
-//				// If difference is 2, add or subtract one from x & y to get inbetween coord
-//	
-//				// Check if it is adjacent with one square inbetween
-//				if (Math.abs(currentCoord[0] - destCoord[0]) == 2 && Math.abs(currentCoord[1] - destCoord[1]) == 2) {
-//	
-//					int[] btCoord = new int[2];
-//	
-//					// Calculate inbetween coord
-//					if (currentCoord[0] > destCoord[0]) {
-//						btCoord[0] = currentCoord[0] - 1;
-//					} else {
-//						btCoord[0] = currentCoord[0] + 1;
-//					}
-//					if (currentCoord[1] > destCoord[1]) {
-//						btCoord[1] = currentCoord[1] - 1;
-//					} else {
-//						btCoord[1] = currentCoord[1] + 1;
-//					}
-//	
-//					Square btSquare = squares[btCoord[0]][btCoord[1]];
-//	
-//					if (btSquare.hasToken() && btSquare.getPlayer() != turn) {
-//	
-//						// Inform destination it has token
-//						destSquare.placeToken(turn);
-//	
-//						// King checks
-//	
-//						if (selected.getKing()) {
-//							destSquare.makeKing();
-//						} else {
-//							attemptKing(destSquare);
-//						}
-//	
-//						// Inform selected it is empty
-//						selected.clear();
-//						selected = null;
-//	
-//						// Inform between square that it is empty
-//						btSquare.clear();
-//	
-//						// Update score
-//	//					window.updateClaimed(turn);
-//						if (turn == 1) {
-//							oneTotal++;
-//						} else {
-//							twoTotal++;
-//						}
-//	
-//						nextTurn();
-//	
-//						if (display != null) {
-//							display.updateDisplay(selected, compTurn);
-//						}
-//	
-//						return true;
-//	
-//					} else {
-//						// !! If there's an error it might be here
-//						return false;
-//					}
-//	
-//				} else {
-//					// Else, do nothing. Do I want to return something for a failed move?
-//					if (window != null) {
-//						window.updateMessage("Invalid move");
-//					}
-//	
-//					return false;
-//				}
-//	
-//			} else {
-//	
-//				if (window != null) {
-//					window.updateMessage("Invalid move");
-//				}
-//	
-//				return false;
-//			}
-//	
-//		}
-
-//	public boolean attemptMove(int[] coord) {
-//		// System.out.println("Attempt move");
-//	
-//		// Check that DESTINATION is an active square and empty
-//		// Do this earlier on?
-//	
-//		Square destSquare = squares[coord[0]][coord[1]];
-//	
-//		if (destSquare.getActive() && destSquare.hasToken() == false) {
-//	
-//			if (validMove(selected.getCoord(), destSquare.getCoord(), selected.getKing())) {
-//	
-//				int currentPlayer = selected.getPlayer();
-//	
-//				// Inform destination it has token
-//				destSquare.placeToken(currentPlayer);
-//	
-//				// King checks
-//	
-//				if (selected.getKing()) {
-//					destSquare.makeKing();
-//				} else {
-//					attemptKing(destSquare);
-//				}
-//	
-//				// Inform selected it is empty
-//				selected.clear();
-//	
-//				// Change selected to null
-//				selected = null;
-//	
-//				// !! Change to return true and have calling function call move
-//				// !! Or something
-//				if (display != null) {
-//					display.updateDisplay(selected, compTurn);
-//				}
-//	
-//				nextTurn();
-//				return true;
-//	
-//			} else {
-//				return attemptJump(coord);
-//			}
-//	
-//		} else {
-//	
-//			if (window != null) {
-//				window.updateMessage("Invalid move");
-//			}
-//	
-//			return false;
-//		}
-//	
-//	}
 
 }
