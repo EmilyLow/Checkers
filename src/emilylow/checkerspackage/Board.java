@@ -150,8 +150,9 @@ public class Board {
 
 	public void toggleCompOn() {
 		compOn = !compOn;
+		display.updateDisplay(selected, compTurn);
 		restart();
-//		System.out.println(compOn);
+
 	}
 
 	public void nextTurn() {
@@ -256,6 +257,7 @@ public class Board {
 		}
 	}
 
+	//!! To do
 	public boolean attemptDoubleJump() {
 		// To attempt after jumping returns true
 		return false;
@@ -273,10 +275,8 @@ public class Board {
 
 	/*
 	 * Called when human player makes an action, to determine what type of action
-	 * was made.
+	 * was made. Comp player calls this also when making final decided move.
 	 */
-	// ! Note, some functionality may need to be moved to be accessible to
-	// compPlayer
 	//!! Note, may be able to edit out check for window existing, but possibly no harm to leaving in?
 	public void attemptAction(int[] coord) {
 
@@ -328,7 +328,6 @@ public class Board {
 			}
 		}
 		
-		//Note: Could probably refactor to put nextMove() and updateDisplay() in attemptAction() if needed.
 					
 	}
 
@@ -402,10 +401,6 @@ public class Board {
 		// Change selected to null
 		selected = null;
 		
-		// !! Later, see if this can be moved to attemptAction(). But check it works without moving first
-	
-		//!! I may remove this from move() and jump() and make it seperate later, to help with iteration.
-//		nextTurn();
 	}
 
 	private boolean validJump(int[] start, int[] end, boolean king) {
@@ -524,8 +519,6 @@ public class Board {
 		
 		selected = chosen;
 		
-
-		
 	}
 
 	public boolean allowedDeselect(int[] coord) {
@@ -539,8 +532,6 @@ public class Board {
 
 	public void deselect() {
 		selected = null; 
-		
-
 
 	}
 
@@ -568,4 +559,9 @@ public class Board {
 		return squares;
 	}
 
+	//Is this bad design?
+	
+	public void updateDisplay() {
+		display.updateDisplay(selected, compTurn);
+	}
 }

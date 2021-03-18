@@ -31,13 +31,16 @@ public class CompPlayer {
 		int[][] move = {{1,2}, {2,3}};
 		
 		realBoard.attemptAction(move[0]);
-		//Insert delay
+		
 		
 		realBoard.attemptAction(move[1]);
-		realBoard.nextTurn();
+		
+		
 	}
 	
-	
+	/*
+	 * Note:  Computer "pretends" to be a human player when its taking actual turn.
+	 */
 	public void beginTurn() {
 		
 		MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
