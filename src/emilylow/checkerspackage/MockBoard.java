@@ -19,8 +19,8 @@ public class MockBoard extends Board {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MockBoard(Square[][] squares, int turn, int oneTotal, int twoTotal, boolean compOn, int count) {
-		super(squares, turn, oneTotal, twoTotal, compOn);
+	public MockBoard(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, boolean compOn, boolean extendedJump, int count) {
+		super(squares, selected, turn, oneTotal, twoTotal, compOn, extendedJump);
 		// TODO Auto-generated constructor stub
 	
 	}
@@ -29,12 +29,16 @@ public class MockBoard extends Board {
 	//Start as finding one move ahead
 	//Note! At some point, add edge case for no move found
 	public int[][] findBestMove() {
-		
+		System.out.println("findBestMove");
 		Square[][] squares = super.getSquares();
 		int[][] bestMove = new int[2][2];
+		
+		
 		int bestScore = -1000; //Star int negative to account for the possibility of no good moves
 		
-		
+		if(super.getExtendedJump()) {
+			bestMove = findExtendedJump();
+		}
 		
 		for (int y = 0; y < squares.length; y++) {
 			for(int x = 0; x < squares[0].length; x++) {
@@ -42,6 +46,7 @@ public class MockBoard extends Board {
 				Square currentSquare = squares[x][y];
 				
 				if(allowedSelect(currentSquare.getCoord())) {
+//					System.out.println("Allowed in if");
 					//Temp
 					//To start with, if move is possible, return move. No recursion yet
 					
@@ -103,7 +108,26 @@ public class MockBoard extends Board {
 		return bestMove;
 	}
 	
-	
+	private int[][]  findExtendedJump() {
+		int[][] bestMove = new int[2][2];
+		int bestScore = -1000;
+		
+		bestMove[0] = super.getSelected().getCoord();
+		int[][] potentialJumps = getJumpCoords(bestMove[0]);
+		for(int i = 0; i < potentialJumps.length; i++) {
+			if(allowedJump(potentialJumps[i])) {
+				int currentScore = 5; 
+				
+				if(currentScore > bestScore) {
+					bestScore = currentScore;
+					bestMove[1] = potentialJumps[i].clone();
+				}
+				
+			} 
+		}
+		
+		return bestMove;
+	}
 	
 	
 	

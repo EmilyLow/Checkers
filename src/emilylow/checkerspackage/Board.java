@@ -73,8 +73,9 @@ public class Board {
 	 * Clone constructor. Should this be done differently? Like, making and then
 	 * setting after? Or passing in a single board and using get on all of its
 	 * elements?
+	 * @param selected, can be null
 	 */
-	Board(Square[][] squares, int turn, int oneTotal, int twoTotal, boolean compOn) {
+	Board(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, boolean compOn, boolean extendedJump) {
 		primary = false;
 
 		// !!! Temp
@@ -86,7 +87,7 @@ public class Board {
 		this.compOn = compOn;
 
 		// !!! Consider if it should be able to start a board with a pre-selected piece
-		selected = null;
+		this.selected = selected;
 
 		this.turn = turn;
 		this.squares = squares;
@@ -100,9 +101,21 @@ public class Board {
 
 	}
 
+	
 	public MockBoard makeMockBoard(int iter) {
+		
+		Square[][]  copySquares = copySquares(squares);
+		Square copySelected;
+		if(selected != null) {
+			 int[] coord = selected.getCoord();
+			 copySelected = copySquares[coord[0]][coord[1]];
+		} else {
+			copySelected = null;
+		}
+		
+		
 
-		MockBoard mockBoard = new MockBoard(copySquares(squares), turn, oneTotal, twoTotal, compOn, iter);
+		MockBoard mockBoard = new MockBoard(copySquares(squares), copySelected, turn, oneTotal, twoTotal, compOn, extendedJump, iter);
 
 		return mockBoard;
 	}
@@ -589,6 +602,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		
 			if(jumpAgain) {
 				extendedJump = true; 
+				System.out.println("Extended jump triggered");
 			} else {
 				extendedJump = false;
 			
@@ -666,5 +680,13 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 	public void updateDisplay() {
 		display.updateDisplay(selected, compTurn);
+	}
+	
+	public boolean getExtendedJump() {
+		return extendedJump;
+	}
+	
+	public Square getSelected() {
+		return selected; 
 	}
 }
