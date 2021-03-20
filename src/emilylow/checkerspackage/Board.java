@@ -29,6 +29,7 @@ public class Board {
 	private int turn;
 	// Is this the right way to do this?
 	private boolean compTurn;
+	private boolean extendedJump;
 	private int oneTotal;
 	private int twoTotal;
 
@@ -48,6 +49,8 @@ public class Board {
 		// This is temporary, before Computer is implemented
 		compOn = false;
 		compTurn = false;
+		
+		extendedJump = false;
 
 		selected = null;
 		turn = 1;
@@ -71,11 +74,16 @@ public class Board {
 	 * setting after? Or passing in a single board and using get on all of its
 	 * elements?
 	 */
-	Board(Square[][] squares, int turn, int oneTotal, int twoTotal) {
+	Board(Square[][] squares, int turn, int oneTotal, int twoTotal, boolean compOn) {
 		primary = false;
 
 		// !!! Temp
-		compOn = false;
+		//Is this causing errors?
+//		compOn = false;
+		
+		//Shouldn't this always be true for a mockboard?
+		//Or does it not matter?
+		this.compOn = compOn;
 
 		// !!! Consider if it should be able to start a board with a pre-selected piece
 		selected = null;
@@ -94,7 +102,7 @@ public class Board {
 
 	public MockBoard makeMockBoard(int iter) {
 
-		MockBoard mockBoard = new MockBoard(copySquares(squares), turn, oneTotal, twoTotal, iter);
+		MockBoard mockBoard = new MockBoard(copySquares(squares), turn, oneTotal, twoTotal, compOn, iter);
 
 		return mockBoard;
 	}
@@ -158,23 +166,39 @@ public class Board {
 
 	public void nextTurn() {
 		if (!checkWin()) {
-			if (turn == 1) {
-				turn = 2;
-				if (compOn) {
+			
+			if(extendedJump) {
+				if(turn == 2 && compOn) {
+					//May be unnecessary
 					compTurn = true;
-					// Alert computer to take turn
-
 					compPlayer.triggerTurn();
-
 				}
+				
+				
 			} else {
-				turn = 1;
-				if (compOn) {
-					compTurn = false;
+				if (turn == 1) {
+					turn = 2;
+					if (compOn) {
+						compTurn = true;
+						// Alert computer to take turn
+
+						compPlayer.triggerTurn();
+
+					}
+				} else {
+					turn = 1;
+					if (compOn) {
+						compTurn = false;
+					}
 				}
+				
+				
 			}
+			
 			window.setTurn(turn, compTurn);
 		}
+		
+		
 		
 		
 	}
@@ -256,6 +280,18 @@ public class Board {
 		} else {
 			return true;
 		}
+	}
+	
+private int[][] getJumpCoords(int[] startCoord) {
+		
+		
+		
+		int x = startCoord[0];
+		int y = startCoord[1];
+		
+		int[][] jumpCoords = {{x-2, y-2}, {x+2, y-2}, {x-2, y+2}, {x+2, y+2}};
+		
+		return jumpCoords;
 	}
 
 	//!! To do
@@ -368,23 +404,30 @@ public class Board {
 
 	public boolean allowedMove(int[] endCoord) {
 
-		boolean validMove = validMove(selected.getCoord(), endCoord, selected.getKing());
-		
-		if(validMove) {
-			
-			Square destSquare = squares[endCoord[0]][endCoord[1]];
-			if (destSquare.getActive() && !destSquare.hasToken()) {
-				
-				return true;
-	
-			} 	else {
-	
+		if(extendedJump) {
 			return false;
-			}
-			
 		} else {
-			return false;
+			boolean validMove = validMove(selected.getCoord(), endCoord, selected.getKing());
+			
+			if(validMove) {
+				
+				Square destSquare = squares[endCoord[0]][endCoord[1]];
+				if (destSquare.getActive() && !destSquare.hasToken()) {
+					
+					return true;
+		
+				} 	else {
+		
+				return false;
+				}
+				
+			} else {
+				return false;
+			}	
+			
+			
 		}
+		
 		
 		
 		
@@ -482,7 +525,8 @@ public class Board {
 
 	public void jump(int[] endCoord) {
 		Square destSquare = squares[endCoord[0]][endCoord[1]];
-		
+		boolean jumpAgain = false;
+		boolean madeKing = false;
 		// Inform destination it has token
 		destSquare.placeToken(turn);
 
@@ -491,6 +535,9 @@ public class Board {
 			destSquare.makeKing();
 		} else {
 			attemptKing(destSquare);
+			if(destSquare.getKing()) {
+				madeKing = true;
+			}
 		}
 
 		
@@ -499,21 +546,59 @@ public class Board {
 		
 		// Inform between square that it is empty
 		btSquare.clear();
+		//Check for double jump
 		
 		// Inform selected it is empty
 			selected.clear();
 			selected = null;
+		
+		//Mark destination as selected to check for doublejumps
+		selected = destSquare;
+		
+		if(!madeKing) {
+			int[][] potentialJumps = getJumpCoords(endCoord);
+			for(int i = 0; i < potentialJumps.length; i++) {
+				if(allowedJump(potentialJumps[i])) {
+//					
+					jumpAgain = true;
+					
+					//Bug! It lets you move again after this if you've become king
+					//Also visually the autojumping doesn't look great
+					
+					//Double jump turn extension? Where the only thing you can do is jump?
+					// if(extendedJump) move == false? 
+					//Can the computer logic work normally if triggered twice in a row?
+					//Will it mess up modeling?
+					
+				}
+				
+			}
+			
+			
+			
+		}
+//		
+		
+		
+	
+			if (turn == 1) {
+				oneTotal++;
+			} else {
+				twoTotal++;
+			}
+		
+			if(jumpAgain) {
+				extendedJump = true; 
+			} else {
+				extendedJump = false;
+			
+				selected = null;
+			}
 				
 
-		// Update score
-		if (turn == 1) {
-			oneTotal++;
-		} else {
-			twoTotal++;
-		}
-
-//		nextTurn();
+	
 		
+
 	
 	}
 
@@ -522,7 +607,7 @@ public class Board {
 	public boolean allowedSelect(int[] coord) {
 		Square chosen = squares[coord[0]][coord[1]];
 		
-		if (selected == null && chosen.hasToken() && chosen.getPlayer() == turn) {
+		if (selected == null && chosen.hasToken() && chosen.getPlayer() == turn && !extendedJump) {
 			return true;
 		} else {
 			return false;
@@ -541,7 +626,7 @@ public class Board {
 
 	public boolean allowedDeselect(int[] coord) {
 
-		if(selected != null && coord.equals(selected.getCoord())) {
+		if(selected != null && coord.equals(selected.getCoord()) && !extendedJump) {
 			return true;
 		} else {
 			return false;

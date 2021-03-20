@@ -19,8 +19,8 @@ public class MockBoard extends Board {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MockBoard(Square[][] squares, int turn, int oneTotal, int twoTotal, int count) {
-		super(squares, turn, oneTotal, twoTotal);
+	public MockBoard(Square[][] squares, int turn, int oneTotal, int twoTotal, boolean compOn, int count) {
+		super(squares, turn, oneTotal, twoTotal, compOn);
 		// TODO Auto-generated constructor stub
 	
 	}
