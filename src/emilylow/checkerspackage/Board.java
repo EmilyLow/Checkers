@@ -30,8 +30,11 @@ public class Board {
 	// Is this the right way to do this?
 	private boolean compTurn;
 	private boolean extendedJump;
+	
 	private int oneTotal;
 	private int twoTotal;
+	private int oneKingTotal;
+	private int twoKingTotal;
 
 	private boolean gameOver;
 
@@ -57,6 +60,8 @@ public class Board {
 		squares = new Square[8][8];
 		oneTotal = 0;
 		twoTotal = 0;
+		oneKingTotal = 0;
+		twoKingTotal = 0;
 
 		window = statusWindow;
 		window.setBoard(this);
@@ -75,7 +80,7 @@ public class Board {
 	 * elements?
 	 * @param selected, can be null
 	 */
-	Board(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, boolean compOn, boolean extendedJump) {
+	Board(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, int oneKingTotal, int twoKingTotal, boolean compOn, boolean extendedJump) {
 		primary = false;
 
 		// !!! Temp
@@ -93,6 +98,8 @@ public class Board {
 		this.squares = squares;
 		this.oneTotal = oneTotal;
 		this.twoTotal = twoTotal;
+		this.oneKingTotal = oneKingTotal;
+		this.twoKingTotal = twoKingTotal; 
 
 		gameOver = false;
 
@@ -115,7 +122,7 @@ public class Board {
 		
 		
 
-		MockBoard mockBoard = new MockBoard(copySquares(squares), copySelected, turn, oneTotal, twoTotal, compOn, extendedJump, iter);
+		MockBoard mockBoard = new MockBoard(copySquares(squares), copySelected, turn, oneTotal, twoTotal, oneKingTotal, twoKingTotal, compOn, extendedJump, iter);
 
 		return mockBoard;
 	}
@@ -326,8 +333,10 @@ private int[][] getJumpCoords(int[] startCoord) {
 
 		if (coord[1] == 0 && potQ.getPlayer() == 1) {
 			potQ.makeKing();
+			oneKingTotal++;
 		} else if (coord[1] == (squares.length - 1) && potQ.getPlayer() == 2) {
 			potQ.makeKing();
+			twoKingTotal++;
 		} // else, not a king so do nothing
 	}
 
@@ -468,6 +477,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 			destSquare.makeKing();
 		} else {
 			attemptKing(destSquare);
+			
 		}
 		
 		// Inform selected it is empty
@@ -558,12 +568,22 @@ private int[][] getJumpCoords(int[] startCoord) {
 			attemptKing(destSquare);
 			if(destSquare.getKing()) {
 				madeKing = true;
+				
+				
 			}
 		}
 
 		
 		int[] btCoord = findBtCoord(selected.getCoord(), endCoord);
 		Square btSquare = squares[btCoord[0]][btCoord[1]];
+		
+		if(btSquare.getKing() ) {
+			if(btSquare.getPlayer() == 1) {
+				oneKingTotal--;
+			} else {
+				twoKingTotal--;
+			}
+		}
 		
 		// Inform between square that it is empty
 		btSquare.clear();
@@ -583,13 +603,6 @@ private int[][] getJumpCoords(int[] startCoord) {
 //					
 					jumpAgain = true;
 					
-					//Bug! It lets you move again after this if you've become king
-					//Also visually the autojumping doesn't look great
-					
-					//Double jump turn extension? Where the only thing you can do is jump?
-					// if(extendedJump) move == false? 
-					//Can the computer logic work normally if triggered twice in a row?
-					//Will it mess up modeling?
 					
 				}
 				
@@ -696,5 +709,18 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 	public Square getSelected() {
 		return selected; 
+	}
+	
+	//Currently assume player two is a positive score and player 1 is a negative score
+	public int getBoardScore() {
+		System.out.println("two total " + twoTotal);
+		System.out.println("one total " + oneTotal);
+		System.out.println("Two King " + twoKingTotal);
+		System.out.println("One King " + oneKingTotal);
+		
+		
+		int num = (twoTotal - oneTotal) + 3*(twoKingTotal - oneKingTotal); 
+		System.out.println("Board Score : " + num);
+		return num;
 	}
 }

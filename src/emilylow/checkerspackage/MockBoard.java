@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class MockBoard extends Board {
 	
 
-	int pathScore;
+
 	/*
 	 * [[x, y], [x2, y2]
 	 *  x = [0][0] y = [0][1] x2 = [1][0] y2 = [1][1]
@@ -19,8 +19,8 @@ public class MockBoard extends Board {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MockBoard(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, boolean compOn, boolean extendedJump, int iter) {
-		super(squares, selected, turn, oneTotal, twoTotal, compOn, extendedJump);
+	public MockBoard(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, int oneKingTotal, int twoKingTotal, boolean compOn, boolean extendedJump, int iter) {
+		super(squares, selected, turn, oneTotal, twoTotal, oneKingTotal, twoKingTotal, compOn, extendedJump);
 		// TODO Auto-generated constructor stub
 		this.iter = iter;
 	
@@ -30,9 +30,10 @@ public class MockBoard extends Board {
 	//Start as finding one move ahead
 	//Note! At some point, add edge case for no move found
 	public int findBestMove() {
-		System.out.println("findBestMove for player" + getTurn());
-		System.out.println("Super Get extended jump: " + super.getExtendedJump());
-		System.out.println(" Get extended jump: " + getExtendedJump());
+//		System.out.println("findBestMove for player" + getTurn());
+//		System.out.println("Super Get extended jump: " + super.getExtendedJump());
+//		System.out.println(" Get extended jump: " + getExtendedJump());
+		System.out.println("iter" + iter);
 		Square[][] squares = super.getSquares();
 		int[][] bestMove = new int[2][2];
 		
@@ -65,31 +66,21 @@ public class MockBoard extends Board {
 					int[][] potentialJumps = getJumpCoords(sqCoord);
 					for(int i = 0; i < potentialJumps.length; i++) {
 						if(allowedJump(potentialJumps[i])) {
-							int currentScore = 5; 
+							int currentScore;
 							
 							
 							//ITERATION HERE
 						
-								MockBoard iterBoard = this.makeMockBoard(iter -1);
-								iterBoard.jump(potentialJumps[i]);
-								
-								Square endedOn = getSquares()[potentialJumps[i][0]][potentialJumps[i][1]];
-						
-								//Check if jump made a king
-								if(endedOn.getKing() && !startKing) {
-									currentScore += 10;
-								}
-								
-								//Check if jump won the game
-								if(iterBoard.checkWin()) {
-									currentScore += 100;
-								}
+							MockBoard iterBoard = this.makeMockBoard(iter -1);
+							iterBoard.jump(potentialJumps[i]);
 								
 								
 								
-							if (iter >= 0) {	
+							if (iter > 0) {	
 								iterBoard.toggleTurn();
-								currentScore = currentScore - iterBoard.findBestMove();
+								currentScore = iterBoard.findBestMove();
+							} else {
+								currentScore = iterBoard.getBoardScore();
 							}
 							
 							if(currentScore > bestScore) {
@@ -105,36 +96,21 @@ public class MockBoard extends Board {
 					int[][] potentialMoves = getMoveCoords(sqCoord);
 					for(int i = 0; i < potentialMoves.length; i++) {
 						if(allowedMove(potentialMoves[i])) {
-							//!! Temp, make the move
-							int currentScore = 0; 
-							if(!currentSquare.getKing()) {
-								currentScore++; 
-							}
+							int currentScore; 
 							
 							//ITERATION HERE
 							
-								MockBoard iterBoard = this.makeMockBoard(iter -1);
-								iterBoard.move(potentialMoves[i]);
-								
-								Square endedOn = getSquares()[potentialMoves[i][0]][potentialMoves[i][1]];
-								
-								//Check if jump made a king
-								if(endedOn.getKing() && !startKing) {
-									currentScore += 10;
-								}
-								
-								//Check if jump won the game
-								if(iterBoard.checkWin()) {
-									currentScore += 100;
-								}
+							MockBoard iterBoard = this.makeMockBoard(iter -1);
+							iterBoard.move(potentialMoves[i]);
 								
 								
 								
-							if (iter >= 0) {
+							if (iter > 0) {	
 								iterBoard.toggleTurn();
-								currentScore = currentScore - iterBoard.findBestMove();
+								currentScore = iterBoard.findBestMove();
+							} else {
+								currentScore = iterBoard.getBoardScore();
 							}
-							
 							
 							if(currentScore > bestScore) {
 								bestScore = currentScore;
@@ -157,7 +133,7 @@ public class MockBoard extends Board {
 			}
 			
 		}
-		
+		System.out.println("iter");
 		System.out.println("Best score: " + bestScore);
 //		System.out.println("Possible move found");
 //		System.out.println(Arrays.deepToString(bestMove));
@@ -233,11 +209,7 @@ public class MockBoard extends Board {
 	//If instead I add to the score based off an action (moving a non-king = 1), I don't have to iterate again.
 	//Bus is iterating over teh board one more time a big deal?
 	
-	public int getBoardScore() {
-		
-		
-		return 0;
-	}
+
 	
 	public int[][] getChosenMove() {
 		return chosenMove;

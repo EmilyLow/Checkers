@@ -16,7 +16,7 @@ public class CompPlayer {
 		// TODO Auto-generated constructor stub
 		
 		realBoard = sourceBoard;
-		iterations = 1;
+		iterations = 3;
 		timer = new Timer(500, new WaitAction());
 		timer.setRepeats(false);
 	}
