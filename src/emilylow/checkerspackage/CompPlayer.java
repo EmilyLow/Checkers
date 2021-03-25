@@ -47,11 +47,12 @@ public class CompPlayer {
 		
 		if(!realBoard.checkWin()) {
 			MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
-			int[][] bestMove = baseMockBoard.findBestMove();
+			baseMockBoard.findBestMove();
+			int[][] chosenMove  = baseMockBoard.getChosenMove();
 			
-			realBoard.attemptAction(bestMove[0]);
+			realBoard.attemptAction(chosenMove[0]);
 			
-			realBoard.attemptAction(bestMove[1]);
+			realBoard.attemptAction(chosenMove[1]);
 		}
 		
 		

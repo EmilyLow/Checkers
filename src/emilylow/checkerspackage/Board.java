@@ -215,6 +215,14 @@ public class Board {
 		
 		
 	}
+	
+	public void toggleTurn() {
+		if(turn == 1) {
+			turn = 2;
+		} else {
+			turn = 1;
+		}
+	}
 
 	// Is it bad practice to have a function that both returns a go-ahead for
 	// another function

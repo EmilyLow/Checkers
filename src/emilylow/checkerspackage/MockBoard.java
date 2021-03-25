@@ -11,33 +11,38 @@ public class MockBoard extends Board {
 	 * [[x, y], [x2, y2]
 	 *  x = [0][0] y = [0][1] x2 = [1][0] y2 = [1][1]
 	 */
-	int[][] bestMove;
-	int count;
+	int[][] chosenMove;
+	int iter;
 
 	public MockBoard(StatusWindow statusWindow) {
 		super(statusWindow);
 		// TODO Auto-generated constructor stub
 	}
 
-	public MockBoard(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, boolean compOn, boolean extendedJump, int count) {
+	public MockBoard(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, boolean compOn, boolean extendedJump, int iter) {
 		super(squares, selected, turn, oneTotal, twoTotal, compOn, extendedJump);
 		// TODO Auto-generated constructor stub
+		this.iter = iter;
 	
 	}
 	
 	
 	//Start as finding one move ahead
 	//Note! At some point, add edge case for no move found
-	public int[][] findBestMove() {
-		System.out.println("findBestMove");
+	public int findBestMove() {
+		System.out.println("findBestMove for player" + getTurn());
+		System.out.println("Super Get extended jump: " + super.getExtendedJump());
+		System.out.println(" Get extended jump: " + getExtendedJump());
 		Square[][] squares = super.getSquares();
 		int[][] bestMove = new int[2][2];
 		
 		
 		int bestScore = -1000; //Star int negative to account for the possibility of no good moves
 		
-		if(super.getExtendedJump()) {
+		//!!! Figure out iteration here in a minute
+		if(getExtendedJump()) {
 			bestMove = findExtendedJump();
+			bestScore = 10;
 		}
 		
 		for (int y = 0; y < squares.length; y++) {
@@ -53,6 +58,7 @@ public class MockBoard extends Board {
 					
 					int[] sqCoord = currentSquare.getCoord();
 					select(sqCoord);
+					boolean startKing = currentSquare.getKing();
 					
 					
 					//Check each potential jump for current piece
@@ -60,6 +66,31 @@ public class MockBoard extends Board {
 					for(int i = 0; i < potentialJumps.length; i++) {
 						if(allowedJump(potentialJumps[i])) {
 							int currentScore = 5; 
+							
+							
+							//ITERATION HERE
+						
+								MockBoard iterBoard = this.makeMockBoard(iter -1);
+								iterBoard.jump(potentialJumps[i]);
+								
+								Square endedOn = getSquares()[potentialJumps[i][0]][potentialJumps[i][1]];
+						
+								//Check if jump made a king
+								if(endedOn.getKing() && !startKing) {
+									currentScore += 10;
+								}
+								
+								//Check if jump won the game
+								if(iterBoard.checkWin()) {
+									currentScore += 100;
+								}
+								
+								
+								
+							if (iter >= 0) {	
+								iterBoard.toggleTurn();
+								currentScore = currentScore - iterBoard.findBestMove();
+							}
 							
 							if(currentScore > bestScore) {
 								bestScore = currentScore;
@@ -79,6 +110,32 @@ public class MockBoard extends Board {
 							if(!currentSquare.getKing()) {
 								currentScore++; 
 							}
+							
+							//ITERATION HERE
+							
+								MockBoard iterBoard = this.makeMockBoard(iter -1);
+								iterBoard.move(potentialMoves[i]);
+								
+								Square endedOn = getSquares()[potentialMoves[i][0]][potentialMoves[i][1]];
+								
+								//Check if jump made a king
+								if(endedOn.getKing() && !startKing) {
+									currentScore += 10;
+								}
+								
+								//Check if jump won the game
+								if(iterBoard.checkWin()) {
+									currentScore += 100;
+								}
+								
+								
+								
+							if (iter >= 0) {
+								iterBoard.toggleTurn();
+								currentScore = currentScore - iterBoard.findBestMove();
+							}
+							
+							
 							if(currentScore > bestScore) {
 								bestScore = currentScore;
 								bestMove[0] = sqCoord.clone();
@@ -105,7 +162,9 @@ public class MockBoard extends Board {
 //		System.out.println("Possible move found");
 //		System.out.println(Arrays.deepToString(bestMove));
 		
-		return bestMove;
+		chosenMove = bestMove.clone();
+		
+		return bestScore;
 	}
 	
 	private int[][]  findExtendedJump() {
@@ -178,6 +237,10 @@ public class MockBoard extends Board {
 		
 		
 		return 0;
+	}
+	
+	public int[][] getChosenMove() {
+		return chosenMove;
 	}
 
 }
