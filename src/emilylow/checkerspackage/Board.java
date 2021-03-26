@@ -100,11 +100,14 @@ public class Board {
 		this.twoTotal = twoTotal;
 		this.oneKingTotal = oneKingTotal;
 		this.twoKingTotal = twoKingTotal; 
+		this.extendedJump = extendedJump;
 
 		gameOver = false;
 
 		window = null;
 		display = null;
+		//Test adding
+		compPlayer = null;
 
 	}
 
@@ -191,7 +194,12 @@ public class Board {
 				if(turn == 2 && compOn) {
 					//May be unnecessary
 					compTurn = true;
-					compPlayer.triggerTurn();
+					if(compPlayer != null) {
+						System.out.println("Turn triggered");
+						compPlayer.triggerTurn();
+						
+					}
+					
 				}
 				
 				
@@ -202,7 +210,9 @@ public class Board {
 						compTurn = true;
 						// Alert computer to take turn
 
-						compPlayer.triggerTurn();
+						if(compPlayer != null) {
+							compPlayer.triggerTurn();
+						}
 
 					}
 				} else {
@@ -214,8 +224,10 @@ public class Board {
 				
 				
 			}
+			if(window != null) {
+				window.setTurn(turn, compTurn);
+			}
 			
-			window.setTurn(turn, compTurn);
 		}
 		
 		
@@ -236,13 +248,19 @@ public class Board {
 	// while also changing the state of the program itself?
 	public boolean checkWin() {
 		if (oneTotal == 12) {
-			window.showWinner(1);
+			if(window != null) {
+				window.showWinner(1);
+			}
+			
 			System.out.println("Player one wins!");
 			// Redundant?
 			gameOver = true;
 			return true;
 		} else if (twoTotal == 12) {
-			window.showWinner(2);
+			if(window != null) {
+				window.showWinner(2);
+			}
+			
 			System.out.println("Player two wins!");
 			gameOver = true;
 			return true;
@@ -302,10 +320,13 @@ public class Board {
 	}
 
 	private boolean outOfBounds(int[] coord) {
-
+//		System.out.println("Out of bounds: " + Arrays.toString(coord));
 		if (0 <= coord[0] && coord[0] <= 7 && 0 <= coord[1] && coord[1] <= 7) {
+//			System.out.println(false);
 			return false;
+			
 		} else {
+//			System.out.println(true);
 			return true;
 		}
 	}
@@ -346,7 +367,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 	 */
 	//!! Note, may be able to edit out check for window existing, but possibly no harm to leaving in?
 	public void attemptAction(int[] coord) {
-
+		
 		// May need to change how gameover works.
 		if (gameOver) {
 
@@ -370,12 +391,12 @@ private int[][] getJumpCoords(int[] startCoord) {
 					deselect();
 				} else if (selected != null) {
 					
-					if (allowedMove(coord)) {
+					if (allowedMove(selected.getCoord(), coord)) {
 						move(coord);
-						nextTurn();
-					} else if (allowedJump(coord)) {
+//						nextTurn();
+					} else if (allowedJump(selected.getCoord(), coord)) {
 						jump(coord);
-						nextTurn();
+//						nextTurn();
 						
 					} else {
 						if (window != null) {
@@ -396,6 +417,47 @@ private int[][] getJumpCoords(int[] startCoord) {
 		}
 		
 					
+	}
+	
+	public boolean allowedAction(int[] startCoord, int[] endCoord) {
+//		System.out.println("Allowed Action");
+		
+		if(!outOfBounds(startCoord) && !outOfBounds(endCoord)) {
+			if(allowedSelect(startCoord) || extendedJump) {
+//				System.out.println("Inside allowedSelect");
+				if(allowedJump(startCoord, endCoord)) {
+					return true;
+				} else if (allowedMove(startCoord, endCoord)) {
+					return true;
+				} else {
+//					System.out.println("No move or jump");
+					return false;
+				}
+				
+				
+			} else {
+				return false;
+			}
+		} else {
+//			System.out.println("Allowed Action: Else Out of Bounds");
+			return false;
+		}
+		
+	}
+	
+	public void takeAction(int[] startCoord, int[] endCoord) {
+		if(extendedJump) {
+			jump(endCoord);
+		} else {
+			selected = squares[startCoord[0]][startCoord[1]];
+			if(allowedJump(startCoord, endCoord)) {
+				jump(endCoord);
+			} else if (allowedMove(startCoord, endCoord)) {
+				move(endCoord);
+			} else {
+				System.out.println("Bug in takeAction(). Neither jump or move.");
+			}
+		}
 	}
 
 	/*
@@ -432,15 +494,20 @@ private int[][] getJumpCoords(int[] startCoord) {
 	}
 
 
-	public boolean allowedMove(int[] endCoord) {
+	private boolean allowedMove(int[] startCoord, int[] endCoord) {
+//		System.out.println("Allowed move");
+//		System.out.println(Arrays.toString(startCoord) + " : " + Arrays.toString(endCoord));
 
 		if(extendedJump) {
 			return false;
 		} else {
-			boolean validMove = validMove(selected.getCoord(), endCoord, selected.getKing());
+			
+			Square startSquare = squares[startCoord[0]][startCoord[1]];
+			
+			boolean validMove = validMove(startCoord, endCoord, startSquare.getKing());
 			
 			if(validMove) {
-				
+//				System.out.println("Inside valid Move");
 				Square destSquare = squares[endCoord[0]][endCoord[1]];
 				if (destSquare.getActive() && !destSquare.hasToken()) {
 					
@@ -457,15 +524,12 @@ private int[][] getJumpCoords(int[] startCoord) {
 			
 			
 		}
-		
-		
-		
-		
+	
 		
 		
 	}
 
-	public void move(int[] endCoord) {
+	private void move(int[] endCoord) {
 		
 		Square destSquare = squares[endCoord[0]][endCoord[1]];
 		int tokenOwner = selected.getPlayer();
@@ -485,6 +549,8 @@ private int[][] getJumpCoords(int[] startCoord) {
 
 		// Change selected to null
 		selected = null;
+		
+		nextTurn();
 		
 	}
 
@@ -517,7 +583,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		
 	}
 
-	public boolean allowedJump(int[] endCoord) {
+	private boolean allowedJump(int[] startCoord, int[] endCoord) {
 		// Checks for single jump initially, with potential ability to iterate later
 		
 			
@@ -525,12 +591,12 @@ private int[][] getJumpCoords(int[] startCoord) {
 //			System.out.println(Arrays.toString(endCoord));
 //			System.out.println(endCoord.toString());
 
-		
-		int[] startCoord = selected.getCoord();
-		
+			
+			Square startSquare = squares[startCoord[0]][startCoord[1]];
 
 	
-			if (validJump(startCoord, endCoord, selected.getKing())) {
+			if (validJump(startCoord, endCoord, startSquare.getKing())) {
+				
 				
 				//Find coordinates of the square being jumped over
 				int[] btCoord = findBtCoord(startCoord, endCoord);
@@ -538,7 +604,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 				Square btSquare = squares[btCoord[0]][btCoord[1]];
 				Square endSquare = squares[endCoord[0]][endCoord[1]];
 
-				if (btSquare.hasToken() && btSquare.getPlayer() != selected.getPlayer() && !endSquare.hasToken()) {
+				if (btSquare.hasToken() && btSquare.getPlayer() != startSquare.getPlayer() && !endSquare.hasToken()) {
 
 					return true;
 
@@ -554,7 +620,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 
 	}
 
-	public void jump(int[] endCoord) {
+	private void jump(int[] endCoord) {
 		Square destSquare = squares[endCoord[0]][endCoord[1]];
 		boolean jumpAgain = false;
 		boolean madeKing = false;
@@ -587,7 +653,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		
 		// Inform between square that it is empty
 		btSquare.clear();
-		//Check for double jump
+		
 		
 		// Inform selected it is empty
 			selected.clear();
@@ -599,8 +665,8 @@ private int[][] getJumpCoords(int[] startCoord) {
 		if(!madeKing) {
 			int[][] potentialJumps = getJumpCoords(endCoord);
 			for(int i = 0; i < potentialJumps.length; i++) {
-				if(allowedJump(potentialJumps[i])) {
-//					
+				if(allowedJump(selected.getCoord(), potentialJumps[i])) {
+					System.out.println("Jump again = true");
 					jumpAgain = true;
 					
 					
@@ -610,8 +676,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 			
 			
 			
-		}
-//		
+		}		
 		
 		
 	
@@ -623,7 +688,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		
 			if(jumpAgain) {
 				extendedJump = true; 
-//				System.out.println("Extended jump triggered");
+				System.out.println("Extended jump triggered");
 			} else {
 				extendedJump = false;
 			
@@ -632,14 +697,14 @@ private int[][] getJumpCoords(int[] startCoord) {
 				
 
 	
-		
+		nextTurn();
 
 	
 	}
 
 	// Note: Added null check for selected while re-factoring.
 	// ! Need to remove null check from attemptAction()
-	public boolean allowedSelect(int[] coord) {
+	private boolean allowedSelect(int[] coord) {
 		Square chosen = squares[coord[0]][coord[1]];
 		
 		if (selected == null && chosen.hasToken() && chosen.getPlayer() == turn && !extendedJump) {
@@ -652,14 +717,14 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 
 
-	public void select(int[] coord) {
+	private void select(int[] coord) {
 		Square chosen = squares[coord[0]][coord[1]];
 		
 		selected = chosen;
 		
 	}
 
-	public boolean allowedDeselect(int[] coord) {
+	private boolean allowedDeselect(int[] coord) {
 
 		if(selected != null && coord.equals(selected.getCoord()) && !extendedJump) {
 			return true;
@@ -668,7 +733,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		}
 	}
 
-	public void deselect() {
+	private void deselect() {
 		selected = null; 
 
 	}

@@ -48,11 +48,12 @@ public class CompPlayer {
 		
 		if(!realBoard.checkWin()) {
 			MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
-			System.out.println("Before base findBestMove()");
+//			System.out.println("Before base findBestMove()");
 			baseMockBoard.findBestMove();
-			System.out.println("Post base findBestMove()");
+//			System.out.println("Post base findBestMove()");
+			System.out.println("Computer checking: " + baseMockBoard.getExtendedJump());
 			int[][] chosenMove  = baseMockBoard.getChosenMove();
-			System.out.println(Arrays.deepToString(chosenMove));
+			System.out.println("Chosen move: " + Arrays.deepToString(chosenMove));
 			
 			realBoard.attemptAction(chosenMove[0]);
 			
