@@ -36,9 +36,10 @@ public class MockBoard extends Board {
 		
 		Square[][] squares = super.getSquares();
 		int[][] bestMove = new int[2][2];
+		boolean baselineFound = false;
 		
 		//Change for minmax
-		int bestScore = -1000;
+		int bestScore = 0;
 		//Minmax, baselineFound
 		
 			
@@ -77,6 +78,8 @@ public class MockBoard extends Board {
 						
 						iterBoard.takeAction(startCoord, endCoord);
 						
+						
+						
 						//Should I be counting iteration differently?
 						if(iter > 0) {
 							foundScore = iterBoard.findBestMove();
@@ -84,15 +87,26 @@ public class MockBoard extends Board {
 							foundScore = getBoardScore();
 						}
 						
+						if(!baselineFound) {
+							bestScore = foundScore;
+							bestMove[0] = startCoord.clone();
+							bestMove[1] = endCoord.clone();
+							baselineFound = true;
+						}
+						
 						//TODO: For minmax, add baseline here
 //						System.out.println("Found score: " + foundScore);
 						
 						//TODO: Add alternations for minmax
-						if(foundScore > bestScore) {
+						if(getTurn() == 2 && foundScore > bestScore) {
 							bestScore = foundScore;
 							bestMove[0] = startCoord.clone();
 							bestMove[1] = endCoord.clone();
 //							System.out.println("Best move: " + Arrays.deepToString(bestMove));
+						} else if(getTurn() == 1 && foundScore < bestScore) {
+							bestScore = foundScore;
+							bestMove[0] = startCoord.clone();
+							bestMove[1] = endCoord.clone();
 						}
 						
 						
