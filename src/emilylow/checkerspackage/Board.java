@@ -623,7 +623,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		
 			if(jumpAgain) {
 				extendedJump = true; 
-				System.out.println("Extended jump triggered");
+//				System.out.println("Extended jump triggered");
 			} else {
 				extendedJump = false;
 			
@@ -713,14 +713,14 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 	//Currently assume player two is a positive score and player 1 is a negative score
 	public int getBoardScore() {
-		System.out.println("two total " + twoTotal);
-		System.out.println("one total " + oneTotal);
-		System.out.println("Two King " + twoKingTotal);
-		System.out.println("One King " + oneKingTotal);
-		
+//		System.out.println("two total " + twoTotal);
+//		System.out.println("one total " + oneTotal);
+//		System.out.println("Two King " + twoKingTotal);
+//		System.out.println("One King " + oneKingTotal);
+//		
 		
 		int num = (twoTotal - oneTotal) + 3*(twoKingTotal - oneKingTotal); 
-		System.out.println("Board Score : " + num);
+//		System.out.println("Board Score : " + num);
 		return num;
 	}
 }

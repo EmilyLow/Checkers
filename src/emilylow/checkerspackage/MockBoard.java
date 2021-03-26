@@ -33,17 +33,25 @@ public class MockBoard extends Board {
 //		System.out.println("findBestMove for player" + getTurn());
 //		System.out.println("Super Get extended jump: " + super.getExtendedJump());
 //		System.out.println(" Get extended jump: " + getExtendedJump());
-		System.out.println("iter" + iter);
+//		System.out.println("iter" + iter);
 		Square[][] squares = super.getSquares();
 		int[][] bestMove = new int[2][2];
 		
 		
 		int bestScore = -1000; //Star int negative to account for the possibility of no good moves
 		
-		//!!! Figure out iteration here in a minute
+		//?? This sometimes breaks but not always?
+		//?? Breaks when not ending on king? (no?)
+		//?? Problem does not appear with no computer player
 		if(getExtendedJump()) {
+			//!! Refactor this so it's deciding which extended jump
 			bestMove = findExtendedJump();
-			bestScore = 10;
+			
+			//Continue iter. Iter never breaks in extended jump.
+			MockBoard iterBoard = this.makeMockBoard(iter);
+			//Can I assume it starts with a selected? 
+			iterBoard.jump(bestMove[1]);
+			bestScore = iterBoard.findBestMove();
 		}
 		
 		for (int y = 0; y < squares.length; y++) {
@@ -133,8 +141,8 @@ public class MockBoard extends Board {
 			}
 			
 		}
-		System.out.println("iter");
-		System.out.println("Best score: " + bestScore);
+//		System.out.println("iter");
+//		System.out.println("Best score: " + bestScore);
 //		System.out.println("Possible move found");
 //		System.out.println(Arrays.deepToString(bestMove));
 		
@@ -209,7 +217,7 @@ public class MockBoard extends Board {
 	//If instead I add to the score based off an action (moving a non-king = 1), I don't have to iterate again.
 	//Bus is iterating over teh board one more time a big deal?
 	
-
+//
 	
 	public int[][] getChosenMove() {
 		return chosenMove;
