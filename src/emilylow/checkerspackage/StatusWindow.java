@@ -1,21 +1,14 @@
 package emilylow.checkerspackage;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 public class StatusWindow extends JPanel{
 	
@@ -48,7 +41,7 @@ public class StatusWindow extends JPanel{
 	JLabel turnLabel;
 	JLabel feedbackLabel;
 	
-//	JToggleButton compToggle;
+
 	JCheckBox compCheck;
 	
 
@@ -113,11 +106,11 @@ public class StatusWindow extends JPanel{
 		 turnLabel = new JLabel("Player 1's turn");
 		 
 		 feedbackLabel = new JLabel("");
-//		 compToggle = new JToggleButton("Play Computer", false);
+
 		 compCheck = new JCheckBox("Play Computer", false);
 		
 		 leftTop.add(resetButton);
-//		 leftBottom.add(compToggle);
+
 		 leftBottom.add(compCheck);
 		
 		 
@@ -139,7 +132,7 @@ public class StatusWindow extends JPanel{
 		 var playerAction = new PlayerAction();
 		
 		 resetButton.addActionListener(resetAction);
-//		 compToggle.addActionListener(playerAction);
+
 		 compCheck.addActionListener(playerAction);
 
 
@@ -156,7 +149,7 @@ public class StatusWindow extends JPanel{
 	
 	public void setBoard(Board passedBoard) {
 		board = passedBoard;
-		//Check later
+	
 		turn = 1;
 		pvp = false;
 		
@@ -164,11 +157,11 @@ public class StatusWindow extends JPanel{
 	
 	public void setTurn(int set, boolean compTurn) {
 		turn = set;
-//		System.out.println(compTurn);
-		//Possibly simplify and remove local var
+//		
+	
 		claimedOne = board.getPlayerOneTotal();
 		claimedTwo = board.getPlayerTwoTotal();
-		//
+		
 		p1Score.setText("" + claimedOne);
 		p2Score.setText("" + claimedTwo);
 		
@@ -183,7 +176,7 @@ public class StatusWindow extends JPanel{
 			
 		}
 		
-		//?? Reset info label here?
+		
 	}
 	
 	public void newGame() {
@@ -237,7 +230,7 @@ public class StatusWindow extends JPanel{
 		}
 		
 		public void actionPerformed(ActionEvent event) {
-			// System.out.println("Newgame click");
+			
 			newGame();
 		}
 		
@@ -250,8 +243,7 @@ private class PlayerAction implements ActionListener {
 		}
 		
 		public void actionPerformed(ActionEvent event) {
-//			System.out.println("Player Click");
-//			// System.out.println(event.toString());
+
 			compPlayerToggled();
 			
 		}

@@ -2,7 +2,7 @@ package emilylow.checkerspackage;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
+
 
 import javax.swing.Timer;
 
@@ -14,7 +14,6 @@ public class CompPlayer {
 	Timer timer;
 	
 	public CompPlayer(Board sourceBoard) {
-		// TODO Auto-generated constructor stub
 		
 		realBoard = sourceBoard;
 		iterations = 3;
@@ -44,16 +43,16 @@ public class CompPlayer {
 	 */
 	public void beginTurn() {
 		
-		//Might want to change how checkWin works
+		
 		
 		if(!realBoard.checkWin()) {
 			MockBoard baseMockBoard = realBoard.makeMockBoard(iterations);
-//			System.out.println("Before base findBestMove()");
+
 			baseMockBoard.findBestMove();
-//			System.out.println("Post base findBestMove()");
-			System.out.println("Computer checking: " + baseMockBoard.getExtendedJump());
+
+
 			int[][] chosenMove  = baseMockBoard.getChosenMove();
-			System.out.println("Chosen move: " + Arrays.deepToString(chosenMove));
+
 			
 			realBoard.attemptAction(chosenMove[0]);
 			

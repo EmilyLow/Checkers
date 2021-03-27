@@ -1,33 +1,24 @@
 package emilylow.checkerspackage;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
+
 import java.awt.geom.Rectangle2D;
 
-//Make more specific?
-import java.lang.*;
-import java.util.Arrays;
 
 public class Board {
 
 	private static final int SIDE_LENGTH = 100;
 	private static final int OFFSET = 50;
-	private static final int TOKEN_SHRINK = 5;
+
 
 	private Square[][] squares;
 	private StatusWindow window;
 	private boolean compOn;
 	private Square selected;
-	// Either 1 or 2
+	
+	/* Designates whether it is player 1 or player 2's turn */
 	private int turn;
-	// Is this the right way to do this?
+	
+	/* Boolean for computer's turn. Computer is always player 2. */
 	private boolean compTurn;
 	private boolean extendedJump;
 	
@@ -41,15 +32,14 @@ public class Board {
 	private Display display;
 	private CompPlayer compPlayer;
 
-	// Possibly make the declaration of this more obvious, and not just implied by
-	// if a statusWindow is given
-	boolean primary;
+
+	
 
 	Board(StatusWindow statusWindow) {
 
-		primary = true;
+	
 
-		// This is temporary, before Computer is implemented
+		
 		compOn = false;
 		compTurn = false;
 		
@@ -81,7 +71,6 @@ public class Board {
 	 * @param selected, can be null
 	 */
 	Board(Square[][] squares, Square selected, int turn, int oneTotal, int twoTotal, int oneKingTotal, int twoKingTotal, boolean compOn, boolean extendedJump) {
-		primary = false;
 
 		// !!! Temp
 		//Is this causing errors?
@@ -187,12 +176,12 @@ public class Board {
 
 	}
 
-	public void nextTurn() {
+	private void nextTurn() {
 		if (!checkWin()) {
 			
 			if(extendedJump) {
 				if(turn == 2 && compOn) {
-					//May be unnecessary
+					
 					compTurn = true;
 					if(compPlayer != null) {
 						System.out.println("Turn triggered");
@@ -208,8 +197,8 @@ public class Board {
 					turn = 2;
 					if (compOn) {
 						compTurn = true;
-						// Alert computer to take turn
-
+						
+						// Alerts computer to take turn
 						if(compPlayer != null) {
 							compPlayer.triggerTurn();
 						}
@@ -234,26 +223,16 @@ public class Board {
 		
 		
 	}
-	
-	public void toggleTurn() {
-		if(turn == 1) {
-			turn = 2;
-		} else {
-			turn = 1;
-		}
-	}
 
-	// Is it bad practice to have a function that both returns a go-ahead for
-	// another function
-	// while also changing the state of the program itself?
+
+	
 	public boolean checkWin() {
 		if (oneTotal == 12) {
 			if(window != null) {
 				window.showWinner(1);
 			}
 			
-			System.out.println("Player one wins!");
-			// Redundant?
+		
 			gameOver = true;
 			return true;
 		} else if (twoTotal == 12) {
@@ -261,7 +240,6 @@ public class Board {
 				window.showWinner(2);
 			}
 			
-			System.out.println("Player two wins!");
 			gameOver = true;
 			return true;
 		} else {
@@ -288,7 +266,7 @@ public class Board {
 				// Unnecessary, since already false, but for clarity
 				direction = false;
 			}
-		} else {// turn == 2
+		} else { // turn == 2
 
 			// Check that player 2 moves down the board
 			if (endY > startY) {
@@ -320,13 +298,13 @@ public class Board {
 	}
 
 	private boolean outOfBounds(int[] coord) {
-//		System.out.println("Out of bounds: " + Arrays.toString(coord));
+		
 		if (0 <= coord[0] && coord[0] <= 7 && 0 <= coord[1] && coord[1] <= 7) {
-//			System.out.println(false);
+
 			return false;
 			
 		} else {
-//			System.out.println(true);
+
 			return true;
 		}
 	}
@@ -343,13 +321,8 @@ private int[][] getJumpCoords(int[] startCoord) {
 		return jumpCoords;
 	}
 
-	//!! To do
-	public boolean attemptDoubleJump() {
-		// To attempt after jumping returns true
-		return false;
-	}
 
-	public void attemptKing(Square potQ) {
+	private void attemptKing(Square potQ) {
 		int[] coord = potQ.getCoord();
 
 		if (coord[1] == 0 && potQ.getPlayer() == 1) {
@@ -365,23 +338,23 @@ private int[][] getJumpCoords(int[] startCoord) {
 	 * Called when human player makes an action, to determine what type of action
 	 * was made. Comp player calls this also when making final decided move.
 	 */
-	//!! Note, may be able to edit out check for window existing, but possibly no harm to leaving in?
+	//TODO More complicated clean up. 
 	public void attemptAction(int[] coord) {
 		
-		// May need to change how gameover works.
+	
 		if (gameOver) {
 
 			if (window != null) {
 				window.updateMessage("Game over. Start new game.");
 			}
 
-			// ! return false;
+	
 		} else {
 
 			if (window != null) {
 				window.clearMessage();
 			}
-			// !! Null check currently exists for StatusWindow. May remove
+
 			if (coord != null) {
 
 				
@@ -393,10 +366,10 @@ private int[][] getJumpCoords(int[] startCoord) {
 					
 					if (allowedMove(selected.getCoord(), coord)) {
 						move(coord);
-//						nextTurn();
+
 					} else if (allowedJump(selected.getCoord(), coord)) {
 						jump(coord);
-//						nextTurn();
+
 						
 					} else {
 						if (window != null) {
@@ -420,17 +393,17 @@ private int[][] getJumpCoords(int[] startCoord) {
 	}
 	
 	public boolean allowedAction(int[] startCoord, int[] endCoord) {
-//		System.out.println("Allowed Action");
+
 		
 		if(!outOfBounds(startCoord) && !outOfBounds(endCoord)) {
 			if(allowedSelect(startCoord) || extendedJump) {
-//				System.out.println("Inside allowedSelect");
+
 				if(allowedJump(startCoord, endCoord)) {
 					return true;
 				} else if (allowedMove(startCoord, endCoord)) {
 					return true;
 				} else {
-//					System.out.println("No move or jump");
+
 					return false;
 				}
 				
@@ -439,7 +412,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 				return false;
 			}
 		} else {
-//			System.out.println("Allowed Action: Else Out of Bounds");
+
 			return false;
 		}
 		
@@ -465,7 +438,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 	 */
 	private boolean validMove(int[] start, int[] end, boolean king) {
 	
-		// Breaking points into individual vars so they're easier to work with
+		//Points are broken down into individual ints to make them easier to work with.
 		int startX = start[0];
 		int startY = start[1];
 	
@@ -476,7 +449,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 			boolean direction = allowedDirection(start, end, king);
 	
-			// Check for adjacency
+		
 	
 			boolean adjacency;
 			if (Math.abs(startX - endX) <= 1 && Math.abs(startY - endY) <= 1) {
@@ -488,15 +461,14 @@ private int[][] getJumpCoords(int[] startCoord) {
 			return direction && adjacency;
 	
 		} else {
-			// Move endpoint is out of bounds, return false.
+			
+
 			return false;
 		}
 	}
 
 
 	private boolean allowedMove(int[] startCoord, int[] endCoord) {
-//		System.out.println("Allowed move");
-//		System.out.println(Arrays.toString(startCoord) + " : " + Arrays.toString(endCoord));
 
 		if(extendedJump) {
 			return false;
@@ -507,7 +479,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 			boolean validMove = validMove(startCoord, endCoord, startSquare.getKing());
 			
 			if(validMove) {
-//				System.out.println("Inside valid Move");
+
 				Square destSquare = squares[endCoord[0]][endCoord[1]];
 				if (destSquare.getActive() && !destSquare.hasToken()) {
 					
@@ -534,7 +506,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 		Square destSquare = squares[endCoord[0]][endCoord[1]];
 		int tokenOwner = selected.getPlayer();
 		
-		// Inform destination it has token
+		// Informs destination it has token
 		destSquare.placeToken(tokenOwner);
 
 		if (selected.getKing()) {
@@ -544,10 +516,8 @@ private int[][] getJumpCoords(int[] startCoord) {
 			
 		}
 		
-		// Inform selected it is empty
+		// Informs selected it is empty
 		selected.clear();
-
-		// Change selected to null
 		selected = null;
 		
 		nextTurn();
@@ -555,7 +525,8 @@ private int[][] getJumpCoords(int[] startCoord) {
 	}
 
 	private boolean validJump(int[] start, int[] end, boolean king) {
-		// Breaking points into individual vars so they're easier to work with
+		
+		// Breaking points into individual ints so they're easier to work with
 		int startX = start[0];
 		int startY = start[1];
 	
@@ -566,7 +537,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 			boolean direction = allowedDirection(start, end, king);
 	
-			// Check for + 1 adjacency
+			// Checks for + 1 adjacency
 			boolean adjacencyPlus;
 			if (Math.abs(startX - endX) == 2 && Math.abs(startY - endY) == 2) {
 				adjacencyPlus = true;
@@ -577,28 +548,21 @@ private int[][] getJumpCoords(int[] startCoord) {
 			return direction && adjacencyPlus;
 	
 		} else {
-			// Endpoint is out of bounds, return false.
+			
 			return false;
 		}
 		
 	}
 
 	private boolean allowedJump(int[] startCoord, int[] endCoord) {
-		// Checks for single jump initially, with potential ability to iterate later
-		
-			
-//			System.out.println("Jump Check: ");
-//			System.out.println(Arrays.toString(endCoord));
-//			System.out.println(endCoord.toString());
 
-			
 			Square startSquare = squares[startCoord[0]][startCoord[1]];
 
 	
 			if (validJump(startCoord, endCoord, startSquare.getKing())) {
 				
 				
-				//Find coordinates of the square being jumped over
+				//Finds coordinates of the square being jumped over
 				int[] btCoord = findBtCoord(startCoord, endCoord);
 
 				Square btSquare = squares[btCoord[0]][btCoord[1]];
@@ -624,7 +588,8 @@ private int[][] getJumpCoords(int[] startCoord) {
 		Square destSquare = squares[endCoord[0]][endCoord[1]];
 		boolean jumpAgain = false;
 		boolean madeKing = false;
-		// Inform destination it has token
+		
+		// Informs destination it has token
 		destSquare.placeToken(turn);
 
 
@@ -651,15 +616,15 @@ private int[][] getJumpCoords(int[] startCoord) {
 			}
 		}
 		
-		// Inform between square that it is empty
+		// Informs between square that it is empty
 		btSquare.clear();
 		
 		
-		// Inform selected it is empty
+		// Informs selected it is empty
 			selected.clear();
 			selected = null;
 		
-		//Mark destination as selected to check for doublejumps
+		//Marks destSquare as selected for use in checking for multi-jumps
 		selected = destSquare;
 		
 		if(!madeKing) {
@@ -702,8 +667,7 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 	}
 
-	// Note: Added null check for selected while re-factoring.
-	// ! Need to remove null check from attemptAction()
+
 	private boolean allowedSelect(int[] coord) {
 		Square chosen = squares[coord[0]][coord[1]];
 		
@@ -738,6 +702,13 @@ private int[][] getJumpCoords(int[] startCoord) {
 
 	}
 
+	public int getBoardScore() {
+	
+		int num = (twoTotal - oneTotal) + 3*(twoKingTotal - oneKingTotal); 
+	
+		return num;
+	}
+
 	public Display getDisplay() {
 		return display;
 	}
@@ -762,7 +733,6 @@ private int[][] getJumpCoords(int[] startCoord) {
 		return squares;
 	}
 
-	//Is this bad design?
 	
 	public void updateDisplay() {
 		display.updateDisplay(selected, compTurn);
@@ -774,18 +744,5 @@ private int[][] getJumpCoords(int[] startCoord) {
 	
 	public Square getSelected() {
 		return selected; 
-	}
-	
-	//Currently assume player two is a positive score and player 1 is a negative score
-	public int getBoardScore() {
-//		System.out.println("two total " + twoTotal);
-//		System.out.println("one total " + oneTotal);
-//		System.out.println("Two King " + twoKingTotal);
-//		System.out.println("One King " + oneKingTotal);
-//		
-		
-		int num = (twoTotal - oneTotal) + 3*(twoKingTotal - oneKingTotal); 
-//		System.out.println("Board Score : " + num);
-		return num;
 	}
 }
