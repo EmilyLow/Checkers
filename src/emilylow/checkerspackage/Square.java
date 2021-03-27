@@ -28,6 +28,19 @@ public class Square {
 //		
 	}
 	
+	public Square(int[] position, int player, boolean active, boolean king) {
+		coord = position;
+		this.player = player;
+		this.active = active;
+		this.king = king;
+		
+		rect = null;
+		squareColor = null;
+		tokenColor = null;
+	}
+	
+
+	
 	public void clear() {
 		player = 0;
 		tokenColor = null;
@@ -38,6 +51,14 @@ public class Square {
 	public void placeToken(int owner) {
 		player = owner;
 		setTokenColor();
+	}
+	
+	//Not clone because only non-visual data is copied.
+	public Square copySquare() {
+		Square copy = new Square(coord.clone(), player, active, king);
+		
+		
+		return copy;
 	}
 	
 	
@@ -134,5 +155,14 @@ public class Square {
 		}
 		
 		
+	}
+	
+	public String toString() {
+		
+		String line1 = "Position: " + coord[0] + ":" + coord[1] + "";
+		String line2 = "Player: " + player;
+		String line3 = "King: " + king;
+		
+		return line1 + "\n" + line2 + "\n" + line3 + "\n";
 	}
 }

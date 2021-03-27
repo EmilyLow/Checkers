@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,32 +44,27 @@ public class StatusWindow extends JPanel{
 	
 	JLabel p1Score;
 	JLabel p2Score;
+	JLabel p2Label;
 	JLabel turnLabel;
 	JLabel feedbackLabel;
 	
-	JToggleButton compToggle;
+//	JToggleButton compToggle;
+	JCheckBox compCheck;
 	
 
-	//TO DO: Make New Game work
+	
 	StatusWindow(){
 		claimedOne = 0;
 		claimedTwo = 0;
 		
 		setLayout(new BorderLayout());
 		
-		//Test, works fine (or not)
-//		setBackground(Color.orange);
+
 		
 		leftPanel = new JPanel(new BorderLayout());
 		centerPanel = new JPanel(new BorderLayout());
 		rightPanel = new JPanel(new BorderLayout());
-		
-		
-		
-		
-
-		 
-		
+	
 		 add(leftPanel, BorderLayout.WEST);
 		 add(centerPanel, BorderLayout.CENTER);
 		 add(rightPanel, BorderLayout.EAST);
@@ -106,38 +102,23 @@ public class StatusWindow extends JPanel{
 		rightContents.add(rightTop, BorderLayout.NORTH);
 		rightContents.add(rightBottom, BorderLayout.SOUTH);
 		
-		
-//		leftContents.setLayout(new GridLayout(2, 1));
-//		buttonPanel.setLayout(new GridLayout(2, 1));
-//		rightContents.setLayout(new GridLayout(2, 1));
 			
 		 
 		 JLabel p1Label = new JLabel("Player 1's score:");
 		  p1Score = new JLabel("" + claimedOne);
 		 
-		 JLabel p2Label = new JLabel("Player 2's score:");
+		 p2Label = new JLabel("Player 2's score:");
 		  p2Score = new JLabel("" + claimedTwo);
 		  
 		 turnLabel = new JLabel("Player 1's turn");
 		 
 		 feedbackLabel = new JLabel("");
-		 compToggle = new JToggleButton("Play Computer", false);
-		 
-		 //First layout
-//		 leftContents.add(p1Label);
-//		 leftContents.add(p1Score);
-//		
-//		 
-//		 centerTop.add(resetButton);
-//		 centerMiddle.add(turnLabel);
-//		 centerBottom.add(feedbackLabel);
-//		 
-//		 rightContents.add(p2Label);
-//		 rightContents.add(p2Score);
-		 
-		 //Second layout
+//		 compToggle = new JToggleButton("Play Computer", false);
+		 compCheck = new JCheckBox("Play Computer", false);
+		
 		 leftTop.add(resetButton);
-		 leftBottom.add(compToggle);
+//		 leftBottom.add(compToggle);
+		 leftBottom.add(compCheck);
 		
 		 
 		 centerTop.add(turnLabel);
@@ -155,31 +136,15 @@ public class StatusWindow extends JPanel{
 		 rightPanel.add(rightContents);
 		 
 		 var resetAction = new ResetAction();
+		 var playerAction = new PlayerAction();
 		
 		 resetButton.addActionListener(resetAction);
+//		 compToggle.addActionListener(playerAction);
+		 compCheck.addActionListener(playerAction);
 
 
 	}
-//	
-//	public void paintComponent(Graphics g) {
-//		
-//		
-//
-//
-//		
-////		
-////		//Basic version
-//		g.drawString("Player " + turn + "'s turn", MESSAGE_X, MESSAGE_Y);
-//	      g.drawString("Pieces won:", MESSAGE_X + 200, MESSAGE_Y -40);
-//	      g.drawString("Player 1: " + board.getPlayerOneTotal(), MESSAGE_X + 200, MESSAGE_Y -20);
-//	      g.drawString("Player 2: " + board.getPlayerTwoTotal(), MESSAGE_X + 200, MESSAGE_Y );
-//
-//	      
-//	     
-//		
-//	   
-//	    
-//	   }  
+ 
 
 	 public Dimension getPreferredSize() 
 	   {  
@@ -197,8 +162,9 @@ public class StatusWindow extends JPanel{
 		
 	}
 	
-	public void setTurn(int set) {
+	public void setTurn(int set, boolean compTurn) {
 		turn = set;
+//		System.out.println(compTurn);
 		//Possibly simplify and remove local var
 		claimedOne = board.getPlayerOneTotal();
 		claimedTwo = board.getPlayerTwoTotal();
@@ -209,7 +175,12 @@ public class StatusWindow extends JPanel{
 		if(turn ==1) {
 			turnLabel.setText("Player 1's turn");
 		} else {
-			turnLabel.setText("Player 2's turn");
+			if(compTurn) {
+				turnLabel.setText("Computer's turn");
+			} else {
+				turnLabel.setText("Player 2's turn");
+			}
+			
 		}
 		
 		//?? Reset info label here?
@@ -226,6 +197,25 @@ public class StatusWindow extends JPanel{
 		turnLabel.setText("Player 1's turn");
 		
 	}
+	
+	public void compPlayerToggled() {
+		board.toggleCompOn();
+		turn = 1;
+		claimedOne = 0;
+		claimedTwo = 0;
+		
+		p1Score.setText("" + 0);
+		p2Score.setText("" + 0);
+		turnLabel.setText("Player 1's turn");
+		
+		if(board.getCompOn()) {
+			p2Label.setText("Computer's score:");
+		} else {
+			p2Label.setText("Player 2's score:");
+		}
+		
+	}
+	
 	
 	public void showWinner(int player) {
 		turnLabel.setText("Game over! Player " + player + " wins!");
@@ -247,8 +237,23 @@ public class StatusWindow extends JPanel{
 		}
 		
 		public void actionPerformed(ActionEvent event) {
-//			System.out.println("Click");
+			// System.out.println("Newgame click");
 			newGame();
+		}
+		
+	}
+	
+private class PlayerAction implements ActionListener {
+		
+		public PlayerAction() {
+			
+		}
+		
+		public void actionPerformed(ActionEvent event) {
+//			System.out.println("Player Click");
+//			// System.out.println(event.toString());
+			compPlayerToggled();
+			
 		}
 		
 	}
