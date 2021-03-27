@@ -16,16 +16,14 @@ public class Square {
 	
 	public Square(int[] position, Rectangle2D rectangle) {
 		coord = position;
-		//Is it best practice to pass in values and return them, like I'm doing, or to use local variables?
+	
 		rect = rectangle;
 		king = false;
 		
 		setActive();
 		setStartToken();
-//		System.out.println("New square");
-//		System.out.println(coord[0] + " " + coord[1]);
-//		System.out.println("active " + active);
-//		
+
+
 	}
 	
 	public Square(int[] position, int player, boolean active, boolean king) {
@@ -47,7 +45,6 @@ public class Square {
 		king = false;
 	}
 	
-	//Double check this code
 	public void placeToken(int owner) {
 		player = owner;
 		setTokenColor();
@@ -134,7 +131,7 @@ public class Square {
 		} else if (player ==2 ){
 			tokenColor = Color.blue; 
 		} else {
-			//What is good practice here?
+			
 			System.out.println("Invalid player. Error.");
 		}
 	}

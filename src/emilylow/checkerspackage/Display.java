@@ -14,10 +14,12 @@ import java.awt.geom.Point2D;
 
 public class Display extends javax.swing.JComponent {
 
+
+	
 	private static final int DEFAULT_WIDTH = 1000;
 	private static final int DEFAULT_HEIGHT = 1000;
 	
-	//!!!Doubled, give one source of truth
+	
 	private static final int SIDE_LENGTH = 100;
 	private static final int OFFSET = 50;
 	private static final int TOKEN_SHRINK = 5;
@@ -29,8 +31,6 @@ public class Display extends javax.swing.JComponent {
 	private Board board;
 	private boolean compTurn;
 	
-	//Debug only
-	int count = 0;
 	
 	
 	public Display(Square[][] squares, Square chosen, Board passedBoard) {
@@ -49,12 +49,12 @@ public class Display extends javax.swing.JComponent {
 	
 	
 	public void updateDisplay(Square chosen, Boolean compTurn) {
-		// System.out.println("Update display");
+		
 		selected = chosen;
 		this.compTurn = compTurn;
 		repaint();
 		
-		// System.out.println("Post update repaint");
+		
 	}
 	
 	public void newGame(Square[][] squares) {
@@ -64,8 +64,7 @@ public class Display extends javax.swing.JComponent {
 	}
 
 	public void paintComponent(Graphics g) {
-		// System.out.println("Paint triggered " + count);
-		count++;
+	
 		var g2 = (Graphics2D) g;
 	
 		
@@ -79,7 +78,7 @@ public class Display extends javax.swing.JComponent {
 				g2.fill(drawSquare.getRect());
 				
 				if(drawSquare.hasToken()) {
-//					
+			
 					g2.setColor(drawSquare.getTokenColor());
 					g2.fill(drawPotentialToken(drawSquare));
 					if(drawSquare.getKing()) {
@@ -158,15 +157,7 @@ public class Display extends javax.swing.JComponent {
 	private class ClickHandler extends MouseAdapter 
 	{
 		
-		//TO DO: Override equals? 
-//		public void mousePressed(MouseEvent event)
-//		{
-//		
-//			board.reportClick(event);
-//			
-//			
-//			
-//		}
+		
 		
 		public void mousePressed(MouseEvent event) {
 			
@@ -178,8 +169,7 @@ public class Display extends javax.swing.JComponent {
 				if(clicked != null) {
 					board.attemptAction(clicked.getCoord());
 				} else {
-					//!!! I'm unsure if this should be a thing.
-					//For now it needs to be so StatusWindow updates.
+					
 					board.attemptAction(null);
 				}
 			}
